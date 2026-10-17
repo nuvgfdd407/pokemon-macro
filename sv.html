@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
+<title>SV多機能マクロ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 1カラムの取扱説明書。上にLED早見表、下に機能ごとの項目。スマホ幅が基準 */
+:root {
+  --bg: #f3f6f8;
+  --surface: #ffffff;
+  --fg: #15202b;
+  --muted: #5a6875;
+  --line: #d7dee5;
+  --accent: #0b8796;
+  --accent-soft: #e2f4f6;
+  --ok: #17803d;
+  --ok-soft: #e3f4e8;
+  --warn: #9a5b00;
+  --warn-soft: #fbf0dc;
+  --code-bg: #edf1f4;
+  /* 本体のLEDの色（実物の色なので両テーマ共通） */
+  --led-white: #ffffff;
+  --led-amber: #ffaa00;
+  --led-green: #1fd25a;
+  --led-blue: #2f6bff;
+  --led-red: #ff3b3b;
+  --led-purple: #a855f7;
+  --led-cyan: #00d9f0;
+  --led-pink: #ff2fb0;
+  --led-orange: #ff6a00;
+  --led-teal: #00c8a0;
+  --led-violet: #7c3aed;
+  --font-display: "DotGothic16", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e141a; --surface: #151d25; --fg: #e5ecf2; --muted: #93a1ae; --line: #26323e;
+    --accent: #3cc6d6; --accent-soft: #12303a; --ok: #5fd68a; --ok-soft: #13301f;
+    --warn: #f1b453; --warn-soft: #33270f; --code-bg: #1c2731; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e141a; --surface: #151d25; --fg: #e5ecf2; --muted: #93a1ae; --line: #26323e;
+  --accent: #3cc6d6; --accent-soft: #12303a; --ok: #5fd68a; --ok-soft: #13301f;
+  --warn: #f1b453; --warn-soft: #33270f; --code-bg: #1c2731; color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15.5px;
+  line-height: 1.75;
+}
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+h1, h2, h3 { text-wrap: balance; line-height: 1.35; margin: 0; }
+h1 { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; letter-spacing: 0.02em; }
+h2 {
+  font-family: var(--font-display); font-weight: 400; font-size: 1.3rem;
+  padding-bottom: 8px; border-bottom: 1px solid var(--line);
+}
+h3 { font-size: 1.08rem; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--accent); }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+section { display: flex; flex-direction: column; gap: 16px; }
+.lead { color: var(--muted); }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+code, .key {
+  font-family: var(--font-mono); font-size: 0.88em; background: var(--code-bg);
+  padding: 1px 6px; border-radius: 4px;
+}
+ul, ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 4px; }
+
+/* LED表示: 色の丸 + 点滅回数の小さな点 */
+.led { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.led i {
+  width: 14px; height: 14px; border-radius: 50%; background: var(--c);
+  box-shadow: 0 0 0 1px var(--line), 0 0 8px color-mix(in srgb, var(--c) 70%, transparent);
+}
+.led b { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 0.95rem; font-weight: 500; line-height: 1; }
+.c-white { --c: var(--led-white); } .c-amber { --c: var(--led-amber); } .c-green { --c: var(--led-green); }
+.c-blue { --c: var(--led-blue); } .c-red { --c: var(--led-red); } .c-purple { --c: var(--led-purple); }
+.c-cyan { --c: var(--led-cyan); } .c-pink { --c: var(--led-pink); } .c-orange { --c: var(--led-orange); } .c-teal { --c: var(--led-teal); } .c-violet { --c: var(--led-violet); }
+
+/* 早見表 */
+.index { display: flex; flex-direction: column; gap: 14px; }
+.group { display: flex; flex-direction: column; gap: 6px; }
+.group-name { font-size: 0.8rem; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; }
+.rows { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); overflow: hidden; }
+.rows a {
+  display: grid; grid-template-columns: 76px 1fr; align-items: center; gap: 10px;
+  padding: 10px 12px; color: var(--fg); text-decoration: none; border-top: 1px solid var(--line);
+}
+.rows a:first-child { border-top: 0; }
+.rows a:hover { background: var(--accent-soft); }
+.rows .name { min-width: 0; }
+
+/* 状態 */
+.pill { font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.pill.ok { color: var(--ok); background: var(--ok-soft); }
+.pill.wip { color: var(--warn); background: var(--warn-soft); }
+
+/* 基本操作 */
+.ops { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.op { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.op .what { font-weight: 700; }
+.op .how { color: var(--muted); font-size: 0.92rem; }
+
+.window-demo { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.window-demo .slot {
+  font-family: var(--font-mono); font-size: 0.85rem; padding: 4px 10px; border-radius: 6px;
+  background: var(--accent-soft); color: var(--fg); border: 1px solid var(--line);
+}
+.window-demo .arrow { color: var(--muted); }
+
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+th, td { padding: 8px 12px; text-align: left; border-top: 1px solid var(--line); white-space: nowrap; }
+thead th { border-top: 0; color: var(--muted); font-weight: 500; font-size: 0.82rem; }
+td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+.steps { display: flex; flex-direction: column; gap: 12px; padding-left: 1.4em; }
+.steps li { padding-left: 4px; }
+.steps strong { display: block; }
+.steps span { display: block; color: var(--muted); font-size: 0.92rem; }
+td .led { margin-right: 6px; vertical-align: -2px; }
+
+/* 機能ごとの項目 */
+.mode {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 18px 16px; display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 16px;
+}
+.mode-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.mode-head h3 { flex: 1 1 auto; min-width: 0; }
+.mode dl { margin: 0; display: grid; grid-template-columns: 4.5em 1fr; gap: 6px 12px; }
+.mode dt { color: var(--muted); font-size: 0.85rem; padding-top: 2px; }
+.mode dd { margin: 0; min-width: 0; }
+.note { font-size: 0.88rem; color: var(--muted); }
+.callout { background: var(--warn-soft); border-radius: 8px; padding: 12px 14px; font-size: 0.92rem; }
+.top-link { font-size: 0.85rem; align-self: flex-end; }
+footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+
+@media (max-width: 420px) {
+  .mode dl { grid-template-columns: 1fr; gap: 2px; }
+  .mode dt { padding-top: 6px; }
+  .rows a { grid-template-columns: 64px 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rows a { transition: background 0.15s; }
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="top">
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <a href="./" style="font-size:0.88rem">← 説明書まとめ</a>
+    <h1>SV多機能マクロ Switch・Switch 2</h1>
+  </header>
+
+  <section aria-labelledby="h-settings">
+    <h2 id="h-settings">先にやっておく設定</h2>
+    <ul>
+      <li>オプション：話のはやさ はやい／わざ覚えスキップ する／手持ち・ボックス 自動で送る／ニックネーム登録 しない</li>
+      <li>マップ：開いて右スティック押し込みで「北が上」に固定</li>
+      <li>オフラインにしておく（テラレイド ホスト以外）</li>
+      <li>青の機能：本体の「インターネットで時刻を合わせる」オフ</li>
+      <li>本体の種類：Switch 1（Lite含む）で使うときは、<a href="#p1">紫1の「本体切替」</a>で切り替える。最初は Switch 2</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-basic">
+    <h2 id="h-basic">使い方</h2>
+    <p class="note">押すのは基板の「BOOT」と書かれたボタン。「RESET」は押さない。</p>
+    <ol class="steps">
+      <li><strong>ゲーム側の準備をする</strong><span>下の「機能ごとの説明」にある開始位置・手持ちにしておく。ここまではいつものコントローラーで操作してOK。</span></li>
+      <li><strong>ボードをSwitchに挿す</strong><span>「コントローラー」→「持ちかた/順番を変える」を開いてから、ドックのUSB端子に挿す。LEDがすみれ色に光り、自動で登録される。続けて白の点滅で本体の設定を知らせる（1回＝Switch 1、2回＝Switch 2）。点滅に変わったら完了。画面を閉じてゲームに戻る。</span></li>
+      <li><strong>ちょん押しで機能を選ぶ</strong><span>押すたびに次の機能に変わる。LEDの色と点滅の回数を、下の早見表で確認する。</span></li>
+      <li><strong>1秒長押しでスタート</strong><span>LEDが機能の色で光りっぱなしになったら動作中。回数を入れる機能は、先に水色の間に回数を入れる（下の「回数の入れ方」）。</span></li>
+      <li><strong>止めるときも1秒長押し</strong><span>終わりがある機能は、最後に本体がスリープする。</span></li>
+    </ol>
+    <h3>LEDの見方</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>光り方</th><th>状態</th></tr></thead>
+        <tbody>
+          <tr><td><span class="led c-violet"><i></i></span> すみれ色で光りっぱなし</td><td>挿した直後。登録中</td></tr>
+          <tr><td><span class="led c-white"><i></i></span> 白で1回か2回点滅</td><td>登録の直後。本体の設定（1回＝Switch 1、2回＝Switch 2）</td></tr>
+          <tr><td>機能の色で点滅</td><td>待機中。点滅の回数と色で、選んでいる機能を表す</td></tr>
+          <tr><td>機能の色で光りっぱなし</td><td>動作中</td></tr>
+          <tr><td><span class="led c-cyan"><i></i></span> 水色</td><td>回数の入力待ち</td></tr>
+          <tr><td><span class="led c-white"><i></i></span> 白く一瞬光る</td><td>入力の1回を受け付けた</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-index">
+    <h2 id="h-index">LED早見表</h2>
+    <div class="index">
+      <div class="group">
+        <div class="group-name">共通</div>
+        <div class="rows">
+          <a href="#w1"><span class="led c-white"><i></i><b>1</b></span><span class="name">A連打</span></a>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-name">卵</div>
+        <div class="rows">
+          <a href="#y1"><span class="led c-amber"><i></i><b>1</b></span><span class="name">卵受取</span></a>
+          <a href="#y2"><span class="led c-amber"><i></i><b>2</b></span><span class="name">卵孵化</span></a>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-name">ボックス</div>
+        <div class="rows">
+          <a href="#g1"><span class="led c-green"><i></i><b>1</b></span><span class="name">ボックス逃がし</span></a>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-name">日付を使う機能・プリンター</div>
+        <div class="rows">
+          <a href="#b1"><span class="led c-blue"><i></i><b>1</b></span><span class="name">競り</span></a>
+          <a href="#b2"><span class="led c-blue"><i></i><b>2</b></span><span class="name">コレクレーのコイン</span></a>
+          <a href="#b3"><span class="led c-blue"><i></i><b>3</b></span><span class="name">どうぐプリンター 乱数</span></a>
+          <a href="#b4"><span class="led c-blue"><i></i><b>4</b></span><span class="name">どうぐプリンター 回数指定</span></a>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-name">周回</div>
+        <div class="rows">
+          <a href="#r1"><span class="led c-red"><i></i><b>1</b></span><span class="name">学校最強大会</span></a>
+          <a href="#r2"><span class="led c-red"><i></i><b>2</b></span><span class="name">テラレイド ホスト（ローカル）</span></a>
+          <a href="#r3"><span class="led c-red"><i></i><b>3</b></span><span class="name">BP集め（そらとぶタイムアタック）</span></a>
+          <a href="#r4"><span class="led c-red"><i></i><b>4</b></span><span class="name">素材集め（その場でレッツゴー）</span></a>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-name">設定</div>
+        <div class="rows">
+          <a href="#p1"><span class="led c-purple"><i></i><b>1</b></span><span class="name">本体切替（Switch 2 ⇔ Switch 1）</span></a>
+          <a href="#p2"><span class="led c-purple"><i></i><b>2</b></span><span class="name">日付+1 テスト</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-input">
+    <h2 id="h-input">回数の入れ方</h2>
+    <p>水色に光っている4秒間に押した回数が数字になる。</p>
+    <div class="window-demo" aria-label="入力の例">
+      <span class="led c-cyan"><i></i></span><span class="slot">1回目 = 10の位</span><span class="arrow">→</span>
+      <span class="led c-cyan"><i></i></span><span class="slot">2回目 = 1の位</span>
+    </div>
+    <ul>
+      <li>12 → 1回目に1回、2回目に2回。ボックス数・回数は何も押さなければ 1。</li>
+    </ul>
+    <h3>卵のサイクル数</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>押す回数</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7以上</th></tr></thead>
+        <tbody><tr><th>サイクル</th><td class="num">40</td><td class="num">5</td><td class="num">10</td><td class="num">15</td><td class="num">20</td><td class="num">25</td><td class="num">30</td><td class="num">35</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-modes">
+    <h2 id="h-modes">機能ごとの説明</h2>
+
+    <article class="mode" id="w1">
+      <div class="mode-head"><span class="led c-white"><i></i><b>1</b></span><h3>A連打</h3></div>
+      <dl>
+        <dt>動き</dt><dd>Aボタンを押し続ける。</dd>
+        <dt>開始</dt><dd>どこでも</dd>
+        <dt>入力</dt><dd>なし</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="y1">
+      <div class="mode-head"><span class="led c-amber"><i></i><b>1</b></span><h3>卵受取</h3></div>
+      <dl>
+        <dt>動き</dt><dd>コサジの小道の灯台へ飛んでピクニック → サンドイッチでタマゴパワー → 30分間、1分ごとにバスケットから卵をもらう → プラトタウンへ戻る、をくり返す。終わったら本体がスリープする。</dd>
+        <dt>準備</dt><dd>
+          <ul>
+            <li>ピクニックとサンドイッチのチュートリアルを終える。</li>
+            <li>「17 スーパーピーナッツバターサンド」のレシピを解放し、材料（バナナスライス・ピーナッツバター・バター・ピック）を回数分買っておく。</li>
+            <li>手持ちは親の<strong>2匹だけ</strong>。ボックスに十分な空きを作る（1回で50個前後）。</li>
+          </ul>
+        </dd>
+        <dt>開始</dt><dd>プラトタウンに「そらをとぶ」した着地点</dd>
+        <dt>入力</dt><dd>水色2回：ピクニックの回数（10の位 → 1の位）</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="y2">
+      <div class="mode-head"><span class="led c-amber"><i></i><b>2</b></span><h3>卵孵化</h3></div>
+      <dl>
+        <dt>動き</dt><dd>ボックスの卵を左の列から5個ずつ手持ちに入れ、ライドで走って孵す。孵ったポケモンはボックスに戻す。終わったら本体がスリープする。</dd>
+        <dt>準備</dt><dd>
+          <ul>
+            <li>手持ちは とくせい「ほのおのからだ」などのポケモン<strong>1匹だけ</strong>。連れ歩きなし、ライドしていない状態。</li>
+            <li>卵を敷き詰めたボックスを並べ、ボックスを開いたときに<strong>最初の卵のボックスが出る</strong>ようにしておく。</li>
+            <li>同じ歩数の卵だけにする。</li>
+          </ul>
+        </dd>
+        <dt>開始</dt><dd>セルクルタウン西から北にある「オリーブころがし」の柵の中（真ん中あたり。オリーブは端に寄せておくとなお良い）</dd>
+        <dt>入力</dt><dd>水色3回：サイクル数 → ボックス数の10の位 → 1の位</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="g1">
+      <div class="mode-head"><span class="led c-green"><i></i><b>1</b></span><h3>ボックス逃がし</h3></div>
+      <dl>
+        <dt>動き</dt><dd>ボックスのポケモンを左上から順に逃がす。指定したボックス数を逃がしたら本体がスリープする。</dd>
+        <dt>準備</dt><dd>逃がすボックスは30匹すべて埋めて並べる（空きやタマゴがあるとずれる）。ボックスを開いたときに最初のボックスが出るようにしておく。</dd>
+        <dt>開始</dt><dd>フィールドでメニューを閉じた状態</dd>
+        <dt>入力</dt><dd>水色2回：ボックス数（10の位 → 1の位）</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="b1">
+      <div class="mode-head"><span class="led c-blue"><i></i><b>1</b></span><h3>競り</h3></div>
+      <dl>
+        <dt>動き</dt><dd>競りでA連打して買う → セーブ → 日付を1日進める → ゲームを再起動、をくり返す。</dd>
+        <dt>準備</dt><dd>お金をたくさん持っておく。</dd>
+        <dt>開始</dt><dd>マリナードタウンの競り会場の受付の前</dd>
+        <dt>入力</dt><dd>なし</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="b2">
+      <div class="mode-head"><span class="led c-blue"><i></i><b>2</b></span><h3>コレクレーのコイン</h3></div>
+      <dl>
+        <dt>動き</dt><dd>パルデア十景を「そらをとぶ」で回って、看板のそばのコレクレーからコインを拾う → セーブ → 日付を1日進めて再起動、をくり返す（1周6分くらい）。</dd>
+        <dt>準備</dt><dd>
+          <ul>
+            <li>パルデア十景にすべて行っておく。</li>
+            <li>ライドから降りておく。</li>
+            <li>ひそやかビーチに「そらをとぶ」して、正面に看板が見える状態（カメラ・主人公とも東向き）でセーブ。</li>
+          </ul>
+        </dd>
+        <dt>開始</dt><dd>上のセーブをした場所</dd>
+        <dt>入力</dt><dd>なし</dd>
+      </dl>
+      <p class="note">飛び先の近くにテラレイドがあるとカーソルが吸われることがある。野生のポケモンと戦闘になったときも、長押しで止める。</p>
+    </article>
+
+    <article class="mode" id="b3">
+      <div class="mode-head"><span class="led c-blue"><i></i><b>3</b></span><h3>どうぐプリンター 乱数</h3></div>
+      <dl>
+        <dt>動き</dt><dd>決まった日時に合わせてプリンターを回し、チャンスタイム → ねらったアイテムの10連、をくり返す。</dd>
+        <dt>準備</dt><dd>
+          <ul>
+            <li>プリンターの改良を最後まで終え、素材とBPをためておく。</li>
+            <li>研究員に話しかけ、プリント回数を<strong>10連</strong>にしておく。</li>
+          </ul>
+        </dd>
+        <dt>開始</dt><dd>研究員に話しかけられる位置。本体の時計を<strong>2050年1月1日 0時0分</strong>にして、<strong>40秒以内</strong>にスタートする</dd>
+        <dt>入力</dt><dd>水色1回：ねらうアイテム（0回なら2）
+          <ul>
+            <li>1回：マスターボール5・ヘビーボール1</li>
+            <li>2回：いろんなボール10個</li>
+            <li>3回：コンペボール5（5連）</li>
+            <li>4回：特性パッチ9</li>
+            <li>5回：虹のテラピース57</li>
+          </ul>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="b4">
+      <div class="mode-head"><span class="led c-blue"><i></i><b>4</b></span><h3>どうぐプリンター 回数指定</h3></div>
+      <dl>
+        <dt>動き</dt><dd>おまかせでプリンターを回す、を指定した回数くり返す。日付は変えない。</dd>
+        <dt>準備</dt><dd>プリント回数（1・5・10連）を先に合わせておく。</dd>
+        <dt>開始</dt><dd>研究員に話しかけられる位置</dd>
+        <dt>入力</dt><dd>水色3回：回数の百の位 → 十の位 → 一の位（53回なら 0・5・3）</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="r1">
+      <div class="mode-head"><span class="led c-red"><i></i><b>1</b></span><h3>学校最強大会</h3></div>
+      <dl>
+        <dt>動き</dt><dd>A連打で学校最強大会をくり返す（金策・レベル上げ）。</dd>
+        <dt>準備</dt><dd>先頭にLv100の強いポケモン（ハバタクカミなど）。技の一番上を強い技にする。</dd>
+        <dt>開始</dt><dd>学校最強大会の受付の前</dd>
+        <dt>入力</dt><dd>なし</dd>
+      </dl>
+      <p class="note">先頭が倒れると止まる。</p>
+    </article>
+
+    <article class="mode" id="r2">
+      <div class="mode-head"><span class="led c-red"><i></i><b>2</b></span><h3>テラレイド ホスト（ローカル）</h3></div>
+      <dl>
+        <dt>動き</dt><dd>同じテラレイドをローカル通信で募集 → 戦闘 → ゲームを再起動、をくり返す。<strong>参加するもう1台のSwitch（ゲスト）が必要</strong>。ゲストは画面のあいことばを入れて参加する。</dd>
+        <dt>準備</dt><dd>
+          <ul>
+            <li>報酬の良いテラレイドを見つけ、Aで始められる位置でセーブしてソフトを終了。</li>
+            <li>本体の時計を、同じ日付のうちで巻き戻しておく（日付が変わるとレイドが変わる）。</li>
+            <li>手持ちの先頭にレイド用のポケモン。使う技を一番上に。</li>
+          </ul>
+        </dd>
+        <dt>開始</dt><dd>レイドの結晶に話しかけられる位置</dd>
+        <dt>入力</dt><dd>水色1回：0回＝一撃で倒せないレイド用（★6など。ホストも攻撃する）／1回以上＝一撃で倒せるレイド用（メタモン、★3・4など。ホストは攻撃しない）</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="r3">
+      <div class="mode-head"><span class="led c-red"><i></i><b>3</b></span><h3>BP集め（そらとぶタイムアタック）</h3></div>
+      <dl>
+        <dt>動き</dt><dd>藍の円盤のそらとぶタイムアタック初級をくり返してBPを集める（1周約90秒・10BP）。</dd>
+        <dt>開始</dt><dd>そらとぶタイムアタックの受付の前</dd>
+        <dt>入力</dt><dd>なし</dd>
+      </dl>
+      <p class="note">雨の日は処理落ちでずれやすい。</p>
+    </article>
+
+    <article class="mode" id="r4">
+      <div class="mode-head"><span class="led c-red"><i></i><b>4</b></span><h3>素材集め（その場でレッツゴー）</h3></div>
+      <dl>
+        <dt>動き</dt><dd>Rでレッツゴー → 指定した秒数待つ → Rで戻す、をくり返す。戦闘になったり色違いが出たりすると止まる。</dd>
+        <dt>準備</dt><dd>先頭にレッツゴー用の高レベルのポケモン。ポケモンが湧き続ける場所ならどこでもいい（キタカミの地獄谷近くの洞窟の、左の岩場で南の窪みを向くのがおすすめ）。</dd>
+        <dt>開始</dt><dd>上の場所で、Lでカメラを向けたい方に合わせた状態</dd>
+        <dt>入力</dt><dd>水色2回：待つ秒数の10の位 → 1の位（どちらも0回なら15秒）</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="p1">
+      <div class="mode-head"><span class="led c-purple"><i></i><b>1</b></span><h3>本体切替</h3></div>
+      <dl>
+        <dt>動き</dt><dd>1秒長押しするたびに Switch 2 ⇔ Switch 1 が切り替わり、白の点滅で知らせる（1回＝Switch 1、2回＝Switch 2）。設定は保存される。</dd>
+        <dt>違い</dt><dd>青の機能の日付変更の手順と、コレクレーのコインの「そらをとぶ」のカーソル移動時間が変わる。</dd>
+      </dl>
+      <p class="note">Switch 1 の日付変更は、ホームにソフトが4本以上並んでいる前提。</p>
+    </article>
+
+    <article class="mode" id="p2">
+      <div class="mode-head"><span class="led c-purple"><i></i><b>2</b></span><h3>日付+1 テスト</h3></div>
+      <dl>
+        <dt>動き</dt><dd>ゲーム中からホームの設定で日付を1日進め、ゲームに戻って止まる。日付変更の手順がずれていないかの確認用。</dd>
+        <dt>開始</dt><dd>ゲーム画面</dd>
+      </dl>
+    </article>
+
+    <a class="top-link" href="#top">早見表に戻る</a>
+  </section>
+</div>
+</body>
+</html>

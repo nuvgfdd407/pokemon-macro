@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
+<title>ストーリーマクロ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 1カラムの取扱説明書。上にLED早見表、下に機能ごとの項目。スマホ幅が基準 */
+:root {
+  --bg: #f3f6f8;
+  --surface: #ffffff;
+  --fg: #15202b;
+  --muted: #5a6875;
+  --line: #d7dee5;
+  --accent: #0b8796;
+  --accent-soft: #e2f4f6;
+  --ok: #17803d;
+  --ok-soft: #e3f4e8;
+  --warn: #9a5b00;
+  --warn-soft: #fbf0dc;
+  --code-bg: #edf1f4;
+  /* 本体のLEDの色（実物の色なので両テーマ共通） */
+  --led-white: #ffffff;
+  --led-amber: #ffaa00;
+  --led-green: #1fd25a;
+  --led-blue: #2f6bff;
+  --led-red: #ff3b3b;
+  --led-purple: #a855f7;
+  --led-cyan: #00d9f0;
+  --led-pink: #ff2fb0;
+  --led-orange: #ff6a00;
+  --led-teal: #00c8a0;
+  --font-display: "DotGothic16", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e141a; --surface: #151d25; --fg: #e5ecf2; --muted: #93a1ae; --line: #26323e;
+    --accent: #3cc6d6; --accent-soft: #12303a; --ok: #5fd68a; --ok-soft: #13301f;
+    --warn: #f1b453; --warn-soft: #33270f; --code-bg: #1c2731; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e141a; --surface: #151d25; --fg: #e5ecf2; --muted: #93a1ae; --line: #26323e;
+  --accent: #3cc6d6; --accent-soft: #12303a; --ok: #5fd68a; --ok-soft: #13301f;
+  --warn: #f1b453; --warn-soft: #33270f; --code-bg: #1c2731; color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15.5px;
+  line-height: 1.75;
+}
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+h1, h2, h3 { text-wrap: balance; line-height: 1.35; margin: 0; }
+h1 { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; letter-spacing: 0.02em; }
+h2 {
+  font-family: var(--font-display); font-weight: 400; font-size: 1.3rem;
+  padding-bottom: 8px; border-bottom: 1px solid var(--line);
+}
+h3 { font-size: 1.08rem; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--accent); }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+section { display: flex; flex-direction: column; gap: 16px; }
+.lead { color: var(--muted); }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+code, .key {
+  font-family: var(--font-mono); font-size: 0.88em; background: var(--code-bg);
+  padding: 1px 6px; border-radius: 4px;
+}
+ul, ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 4px; }
+
+/* LED表示: 色の丸 + 点滅回数の小さな点 */
+.led { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.led i {
+  width: 14px; height: 14px; border-radius: 50%; background: var(--c);
+  box-shadow: 0 0 0 1px var(--line), 0 0 8px color-mix(in srgb, var(--c) 70%, transparent);
+}
+.led b { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 0.95rem; font-weight: 500; line-height: 1; }
+.c-white { --c: var(--led-white); } .c-amber { --c: var(--led-amber); } .c-green { --c: var(--led-green); }
+.c-blue { --c: var(--led-blue); } .c-red { --c: var(--led-red); } .c-purple { --c: var(--led-purple); }
+.c-cyan { --c: var(--led-cyan); } .c-pink { --c: var(--led-pink); } .c-orange { --c: var(--led-orange); } .c-teal { --c: var(--led-teal); }
+
+/* 早見表 */
+.index { display: flex; flex-direction: column; gap: 14px; }
+.group { display: flex; flex-direction: column; gap: 6px; }
+.group-name { font-size: 0.8rem; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; }
+.rows { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); overflow: hidden; }
+.rows a {
+  display: grid; grid-template-columns: 76px 1fr; align-items: center; gap: 10px;
+  padding: 10px 12px; color: var(--fg); text-decoration: none; border-top: 1px solid var(--line);
+}
+.rows a:first-child { border-top: 0; }
+.rows a:hover { background: var(--accent-soft); }
+.rows .name { min-width: 0; }
+
+/* 状態 */
+.pill { font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.pill.ok { color: var(--ok); background: var(--ok-soft); }
+.pill.wip { color: var(--warn); background: var(--warn-soft); }
+
+/* 基本操作 */
+.ops { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.op { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.op .what { font-weight: 700; }
+.op .how { color: var(--muted); font-size: 0.92rem; }
+
+.window-demo { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.window-demo .slot {
+  font-family: var(--font-mono); font-size: 0.85rem; padding: 4px 10px; border-radius: 6px;
+  background: var(--accent-soft); color: var(--fg); border: 1px solid var(--line);
+}
+.window-demo .arrow { color: var(--muted); }
+
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+th, td { padding: 8px 12px; text-align: left; border-top: 1px solid var(--line); white-space: nowrap; }
+thead th { border-top: 0; color: var(--muted); font-weight: 500; font-size: 0.82rem; }
+td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+.steps { display: flex; flex-direction: column; gap: 12px; padding-left: 1.4em; }
+.steps li { padding-left: 4px; }
+.steps strong { display: block; }
+.steps span { display: block; color: var(--muted); font-size: 0.92rem; }
+td .led { margin-right: 6px; vertical-align: -2px; }
+
+/* 機能ごとの項目 */
+.mode {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 18px 16px; display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 16px;
+}
+.mode-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.mode-head h3 { flex: 1 1 auto; min-width: 0; }
+.mode dl { margin: 0; display: grid; grid-template-columns: 4.5em 1fr; gap: 6px 12px; }
+.mode dt { color: var(--muted); font-size: 0.85rem; padding-top: 2px; }
+.mode dd { margin: 0; min-width: 0; }
+.note { font-size: 0.88rem; color: var(--muted); }
+.callout { background: var(--warn-soft); border-radius: 8px; padding: 12px 14px; font-size: 0.92rem; }
+.top-link { font-size: 0.85rem; align-self: flex-end; }
+footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+
+@media (max-width: 420px) {
+  .mode dl { grid-template-columns: 1fr; gap: 2px; }
+  .mode dt { padding-top: 6px; }
+  .rows a { grid-template-columns: 64px 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rows a { transition: background 0.15s; }
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="top">
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <a href="./" style="font-size:0.88rem">← 説明書まとめ</a>
+    <h1>ストーリーマクロ</h1>
+  </header>
+
+  <section aria-labelledby="h-basic">
+    <h2 id="h-basic">使い方</h2>
+    <p class="note">押すのは基板の「BOOT」と書かれたボタン。「RESET」は押さない。登録中にオレンジに光るのがストーリーマクロ。</p>
+    <ol class="steps">
+      <li><strong>ボードをSwitchに挿す</strong><span>「コントローラー」→「持ちかた/順番を変える」を開いてから、ドックのUSB端子に挿す。LEDがオレンジに光り、自動で登録される。点滅に変わったら完了。画面を閉じてゲームに戻る。</span></li>
+      <li><strong>素早く2回押して作品を選ぶ</strong><span>剣盾 ⇔ BDSP が切り替わる。切り替えると作品の色で3回速く光る（剣盾＝オレンジ、BDSP＝青緑）。</span></li>
+      <li><strong>ちょん押しで機能を選ぶ</strong><span>点滅の色と回数を下の早見表で確認する。</span></li>
+      <li><strong>1秒長押しでスタート</strong><span>光りっぱなしになったら動作中。途中で止めるときも1秒長押し。</span></li>
+    </ol>
+    <h3>LEDの見方</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>光り方</th><th>状態</th></tr></thead>
+        <tbody>
+          <tr><td><span class="led c-orange"><i></i></span> 挿した直後にオレンジ</td><td>登録中</td></tr>
+          <tr><td>作品の色で点滅</td><td>待機中。点滅の回数で選んでいる機能を表す</td></tr>
+          <tr><td>作品の色で光りっぱなし</td><td>動作中</td></tr>
+          <tr><td>作品の色で3回速く光る</td><td>作品を切り替えた（剣盾＝オレンジ、BDSP＝青緑）</td></tr>
+          <tr><td><span class="led c-cyan"><i></i></span> 水色</td><td>回数の入力待ち（4秒間に押した回数が数字になる）</td></tr>
+          <tr><td><span class="led c-white"><i></i></span> 白く一瞬光る</td><td>入力の1回を受け付けた</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-index">
+    <h2 id="h-index">LED早見表</h2>
+    <h3>剣盾</h3>
+    <div class="index"><div class="group"><div class="rows">
+      <a href="#a"><span class="led c-orange"><i></i><b>1</b></span><span class="name">序盤</span></a>
+      <a href="#b"><span class="led c-orange"><i></i><b>2</b></span><span class="name">中盤以降</span></a>
+      <a href="#bset"><span class="led c-orange"><i></i><b>3</b></span><span class="name">中盤以降 設定</span></a>
+      <a href="#zs"><span class="led c-orange"><i></i><b>4</b></span><span class="name">ザシアン・ザマゼンタ（クリア後）</span></a>
+      <a href="#cal"><span class="led c-orange"><i></i><b>5</b></span><span class="name">バドレックス（冠の雪原）</span></a>
+    </div></div></div>
+    <h3>BDSP</h3>
+    <div class="index"><div class="group"><div class="rows">
+      <a href="#early"><span class="led c-teal"><i></i><b>1</b></span><span class="name">序盤</span></a>
+      <a href="#mid"><span class="led c-teal"><i></i><b>2</b></span><span class="name">中盤</span></a>
+    </div></div></div>
+  </section>
+
+  <section aria-labelledby="h-swsh">
+    <h2 id="h-swsh">剣盾 ストーリー</h2>
+    <ol class="steps">
+      <li><strong><a href="#a">序盤</a>（約45分）</strong><span>名前を決めた直後 → 最初のワイルドエリア。イワークにやられてエンジンシティ前に戻り、本体がスリープして終わる。</span></li>
+      <li><strong><a href="#manual">手動の準備</a>（30分くらい）</strong><span>シェルダーを捕まえて育てる。自爆用とダブルバトル用のポケモンも用意する。</span></li>
+      <li><strong><a href="#b">中盤以降</a>（約6時間）</strong><span>エンジンシティの入り口 → 殿堂入り。最後に本体がスリープして終わる。</span></li>
+    </ol>
+    <p class="note">ゲーム内の設定（話の速さなど）は、序盤の中で自動で変える。Switch 2 での動作はまだ確認していない（元のプログラムは初代Switchで確認されている）。</p>
+    <article class="mode" id="a">
+      <div class="mode-head"><span class="led c-orange"><i></i><b>1</b></span><h3>序盤</h3></div>
+      <dl>
+        <dt>開始</dt><dd>ゲームを新しく始めて、言語・見た目・名前を決め終えた直後</dd>
+        <dt>終わり</dt><dd>最初のワイルドエリアでイワークにやられ、エンジンシティ前に戻って本体がスリープする</dd>
+        <dt>入力</dt><dd>なし</dd>
+      </dl>
+      <p class="note">ごくまれにメッソンがひんしになって進めなくなる。そのときはやり直すか、手で進める。</p>
+    </article>
+
+    <article class="mode" id="manual">
+      <div class="mode-head"><h3>手動の準備（序盤と中盤以降の間）</h3></div>
+      <ol>
+        <li>エンジンシティ前に戻った場所から、正面の湖の釣りポイントで釣りをして、<strong>シェルダー</strong>（20%）を捕まえる。特性がスキルリンクで、性格が攻撃の下がるものでないかを確認する（あとでミントでもOK）。</li>
+        <li>ポケモンHOMEで、育成用の別のセーブデータに送る。</li>
+        <li>シェルダーを<strong>Lv100</strong>、努力値 攻撃・素早さ252、攻撃に銀の王冠。素早さが下がる性格で個体値15以下なら素早さにも王冠（パルシェンの素早さが201以上になるように）。技は<strong>つららばりだけ</strong>にする。</li>
+        <li><strong>自爆用</strong>：自爆を覚える低レベルのポケモン（タンドンなど）。技の一番上を「じばく」にする。</li>
+        <li><strong>ダブルバトル用</strong>：Lv80以下で、この先レベルアップで技を覚えないポケモン。技の一番上を相手2体を攻撃する技にする（ワイルドエリアのLv60くらいのオノノクス＋ワイドブレイカーがおすすめ）。</li>
+        <li>もう一度ポケモンHOMEで、自動で進めるセーブデータに戻す。</li>
+        <li>手持ちは<strong>シェルダー1匹だけ</strong>。ボックス1の<strong>左上に自爆用</strong>、<strong>左下にダブルバトル用</strong>を置く。</li>
+      </ol>
+      <p class="note">経験アメ、銀の王冠、タウリン・インドメタシン（各26個）などが必要なので、育成用のセーブデータはクリア済みのものがおすすめ。</p>
+    </article>
+
+    <article class="mode" id="bset">
+      <div class="mode-head"><span class="led c-orange"><i></i><b>3</b></span><h3>中盤以降 設定</h3></div>
+      <p>中盤以降の前に一度だけやる。値は保存される。設定しなければ「DLCあり・背番号25・プレミアボール」。</p>
+      <dl>
+        <dt>入力</dt><dd>
+          水色6回
+          <ul>
+            <li>1回目：DLC（0回＝あり／1回以上＝なし）</li>
+            <li>2〜4回目：背番号の百の位 → 十の位 → 一の位（すべて0回なら25）</li>
+            <li>5〜6回目：ムゲンダイナを捕まえるボールの番号の十の位 → 一の位（下の表）</li>
+          </ul>
+        </dd>
+        <dt>結果</dt><dd>白（1回＝DLCあり／2回＝なし）→ 黄（背番号）→ 水色（ボール番号）の順に点滅で知らせる。0は長く1回。</dd>
+      </dl>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>番号</th><th>ボール</th></tr></thead>
+          <tbody>
+          <tr><td class="num">0</td><td>モンスターボール</td></tr>
+          <tr><td class="num">1</td><td>フレンドボール</td></tr>
+          <tr><td class="num">2</td><td>ルアーボール</td></tr>
+          <tr><td class="num">3</td><td>レベルボール</td></tr>
+          <tr><td class="num">4</td><td>ヘビーボール</td></tr>
+          <tr><td class="num">5</td><td>ラブラブボール</td></tr>
+          <tr><td class="num">6</td><td>ムーンボール</td></tr>
+          <tr><td class="num">7</td><td>ドリームボール</td></tr>
+          <tr><td class="num">9</td><td>手動で用意したボール（下の注意）</td></tr>
+          <tr><td class="num">10</td><td>プレミアボール</td></tr>
+          <tr><td class="num">11</td><td>スーパーボール</td></tr>
+          <tr><td class="num">12</td><td>ハイパーボール</td></tr>
+          <tr><td class="num">13</td><td>ヒールボール</td></tr>
+          <tr><td class="num">14</td><td>ネットボール</td></tr>
+          <tr><td class="num">15</td><td>ネストボール</td></tr>
+          <tr><td class="num">16</td><td>ダイブボール</td></tr>
+          <tr><td class="num">17</td><td>ダークボール</td></tr>
+          <tr><td class="num">18</td><td>タイマーボール</td></tr>
+          <tr><td class="num">19</td><td>ゴージャスボール</td></tr>
+          <tr><td class="num">20</td><td>クイックボール</td></tr>
+          <tr><td class="num">21</td><td>リピートボール</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">9：マスターボールなどで捕まえたい場合は、通信交換などで手に入れ、ボールのリストの2番目（1番目はモンスターボール）に置いてから9を選ぶ。8（スピードボール）は使えない。</p>
+    </article>
+
+    <article class="mode" id="b">
+      <div class="mode-head"><span class="led c-orange"><i></i><b>2</b></span><h3>中盤以降</h3></div>
+      <dl>
+        <dt>開始</dt><dd>手動の準備が終わったデータで、ワイルドエリアから<strong>エンジンシティへの入り口をくぐったところ</strong></dd>
+        <dt>終わり</dt><dd>殿堂入りまで進めて、本体がスリープする</dd>
+        <dt>入力</dt><dd>なし（先に「中盤以降 設定」をしておく）</dd>
+      </dl>
+      <p class="note">戦闘で技を選ばずに進むので、準備がずれていると止まる。8番道路やウールーを誘導する場面で止まることがある。今は途中から再開できないので、止まったら場面を教えてもらって直す。</p>
+    </article>
+
+    <article class="mode" id="zs">
+      <div class="mode-head"><span class="led c-orange"><i></i><b>4</b></span><h3>ザシアン・ザマゼンタ（クリア後）</h3></div>
+      <dl>
+        <dt>開始</dt><dd>ストーリーをクリアした直後、ハロンタウンに「そらをとぶ」で来たところ</dd>
+        <dt>終わり</dt><dd>ザシアン／ザマゼンタの捕獲の直前（約1時間）。本体がスリープする。捕獲は自分で</dd>
+        <dt>準備</dt><dd>
+          <ul>
+            <li>手持ち：パルシェン（Lv100、つららばり、こうげき・すばやさ252、こだわりハチマキ）</li>
+            <li>ボックス1の左上：リザードン（Lv100、かえんほうしゃ、とくこう・すばやさ252）</li>
+            <li>DLCの有無は「中盤以降 設定」の値を使う</li>
+          </ul>
+        </dd>
+        <dt>入力</dt><dd>
+          水色3回
+          <ul>
+            <li>1回目：0回＝リザードンと交代しながら戦う（おすすめ）／1回以上＝パルシェンだけ</li>
+            <li>2〜3回目：始めるパート番号の十の位 → 一の位（どちらも0回なら最初から）</li>
+          </ul>
+        </dd>
+      </dl>
+      <p class="note">止まったら、そのパートが終わるところまで手で進めて、次のパート番号から始める。</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>番号</th><th>パート</th></tr></thead>
+          <tbody>
+          <tr><td class="num">1</td><td>くちた剣（盾）を返しに行く</td></tr>
+          <tr><td class="num">2</td><td>ブラッシータウンの研究所へ</td></tr>
+          <tr><td class="num">3</td><td>ターフタウン</td></tr>
+          <tr><td class="num">4</td><td>バウタウン</td></tr>
+          <tr><td class="num">5</td><td>エンジンシティ</td></tr>
+          <tr><td class="num">6</td><td>研究所（ソッド＆シルディ）</td></tr>
+          <tr><td class="num">7</td><td>ラテラルタウン</td></tr>
+          <tr><td class="num">8</td><td>アラベスクタウン</td></tr>
+          <tr><td class="num">9</td><td>キルクスタウン</td></tr>
+          <tr><td class="num">10</td><td>ナックルシティ</td></tr>
+          <tr><td class="num">11</td><td>ソッド＆シルディ（2回目）</td></tr>
+          <tr><td class="num">12</td><td>ザシアン／ザマゼンタとの戦い</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="mode" id="cal">
+      <div class="mode-head"><span class="led c-orange"><i></i><b>5</b></span><h3>バドレックス（冠の雪原）</h3></div>
+      <dl>
+        <dt>開始</dt><dd>ブラッシータウンに「そらをとぶ」で来たところ（ポケモンセンターから出ただけだと位置がずれて動かない）</dd>
+        <dt>終わり</dt><dd>バドレックスの捕獲の直前（約3時間）。本体がスリープする。捕獲は自分で</dd>
+        <dt>準備</dt><dd>
+          <ul>
+            <li>DLC（冠の雪原）を買ってあり、DLCのストーリーはまだ進めていない</li>
+            <li>手持ちはパルシェン1匹だけ（Lv100、スキルリンク、こだわりハチマキ、こうげき・すばやさ252、こうげきに王冠、技はつららばりだけ）</li>
+            <li>ボックス1を空にする</li>
+            <li>おこづかいを27,900円以上にする</li>
+            <li>黒馬でこだわりスカーフを持っている場合：バッグの「どうぐ」でこだわりスカーフだけお気に入りにして、種類順に並べて先頭にする</li>
+          </ul>
+        </dd>
+        <dt>入力</dt><dd>
+          水色4回
+          <ul>
+            <li>1回目：0回＝白馬（ブリザポス）／1回以上＝黒馬（レイスポス）</li>
+            <li>2回目：こだわりスカーフ 0回＝持っていない／1回以上＝持っている（黒馬のときだけ使う）</li>
+            <li>3〜4回目：始めるパート番号の十の位 → 一の位（どちらも0回なら最初から）</li>
+          </ul>
+        </dd>
+      </dl>
+      <p class="note">スタート時に白の点滅で馬を知らせる（1回＝白馬、2回＝黒馬）。</p>
+      <p class="callout">ダイマックスアドベンチャーで強制レポートがあり、バックアップも上書きされる。大事なポケモンや道具は先に別の場所へ。伝説のポケモン（特にスイクン）を持ち帰ることがある。作者の報告では、3回に2回くらいは途中で止まる。作者は Switch 2 には未対応としている。止まったら、そのパートが終わるところまで手で進めて、次のパート番号から始める。</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>番号</th><th>パート</th></tr></thead>
+          <tbody>
+          <tr><td class="num">1</td><td>冠の雪原へ</td></tr>
+          <tr><td class="num">2</td><td>ダイマックスアドベンチャーの巣穴へ</td></tr>
+          <tr><td class="num">3</td><td>はじめてのダイマックスアドベンチャー</td></tr>
+          <tr><td class="num">4</td><td>ダイこうせき</td></tr>
+          <tr><td class="num">5</td><td>フリーズ村へ</td></tr>
+          <tr><td class="num">6</td><td>冒険のはじまり</td></tr>
+          <tr><td class="num">7</td><td>バドレックスに会う</td></tr>
+          <tr><td class="num">8</td><td>村長をさがす</td></tr>
+          <tr><td class="num">9</td><td>にんじんの調査</td></tr>
+          <tr><td class="num">10</td><td>雪中渓谷</td></tr>
+          <tr><td class="num">11</td><td>こだわりスカーフ</td></tr>
+          <tr><td class="num">12</td><td>やせた畑</td></tr>
+          <tr><td class="num">13</td><td>たづなを作る</td></tr>
+          <tr><td class="num">14</td><td>神殿へ</td></tr>
+          <tr><td class="num">15</td><td>馬に乗ったバドレックス</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+
+  <section aria-labelledby="h-bdsp">
+    <h2 id="h-bdsp">BDSP ストーリー</h2>
+    <ol class="steps">
+      <li><strong><a href="#early">序盤</a>（約2時間）</strong><span>名前を決めた直後 → コトブキシティで「ふしぎなおくりもの」解放まで。最初のポケモンはヒコザル。</span></li>
+      <li><strong><a href="#prep">手動の準備</a></strong><span>ヒコザルを別のデータでLv68以上のゴウカザルに育てて戻す。道具とメニューの並びを整える。</span></li>
+      <li><strong><a href="#mid">中盤</a></strong><span>204番道路の看板の前 → ポケモンリーグ到達。そのあと図鑑埋めの寄り道とサファリゲーム。</span></li>
+      <li><strong>手動</strong><span>ライバル・四天王・チャンピオンは自分で戦う。</span></li>
+    </ol>
+    <p class="note">Switch 2 での動作はまだ確認していない（元のプログラムは初代Switch向け。Switch 2では読み込みの速さの違いで歩数がずれるという報告がある）。</p>
+    <article class="mode" id="early">
+      <div class="mode-head"><span class="led c-teal"><i></i><b>1</b></span><h3>序盤</h3></div>
+      <dl>
+        <dt>開始</dt><dd>ゲームを新しく始め、言語・主人公とライバルの名前を決めた直後（ナナカマド博士の話の途中）</dd>
+        <dt>終わり</dt><dd>コトブキシティでギンガ団とのタッグバトルのあと、テレビコトブキ3Fのディレクターに話しかけるところ</dd>
+        <dt>入力</dt><dd>なし</dd>
+      </dl>
+      <p class="note">最初のポケモンはヒコザル。野生のポケモンは捕まえずに進む。戦闘の一部は運に左右されるので、まれに止まる（ヒョウタ戦のあとのショップの出口でぶつかって止まる報告あり）。</p>
+    </article>
+
+    <article class="mode" id="prep">
+      <div class="mode-head"><h3>手動の準備（序盤と中盤の間）</h3></div>
+      <ol>
+        <li>草むらでポケモンを1匹捕まえる（通信交換に2匹以上必要）。</li>
+        <li>ヒコザルを通信交換で別のデータに送り、<strong>Lv68以上のゴウカザル</strong>（フレアドライブを覚えるところまで）に育てる。性格が攻撃の下がるもの（ひかえめなど）でなければOK。</li>
+        <li>技を上から「<strong>かえんほうしゃ</strong>」「<strong>マッハパンチ</strong>」「<strong>アクロバット</strong>」「<strong>インファイト</strong>」にする（ノモセシティでハートのウロコで思い出せる）。持ち物は持たせない。</li>
+        <li>ゴウカザルを戻し、手持ちを<strong>ゴウカザル1匹だけ</strong>にする。ボックス1の左上に適当なポケモンを預けて（やりのはしらのダブルバトル用。上の技がまともな攻撃技だと安心）、ボックスを閉じる。</li>
+        <li>ショップで「<strong>むしよけスプレー</strong>」20個以上、「<strong>あなぬけのヒモ</strong>」3個以上を買い、道具ポケットの一番上を むしよけ → あなぬけ の順に並べる（お気に入りは全部外す）。余計な道具は買わない。</li>
+        <li>Xボタンのメニューで、上の段の一番左の「図鑑」と左から3番目の「バッグ」を入れ替え、[バッグ][ポケモン][図鑑]… の順にする。</li>
+        <li>本体の時刻を<strong>18時〜1時</strong>にしておく（朝だけ出るトレーナーを避けるため）。</li>
+        <li>204番道路の看板の左と下にいる短パン小僧・ミニスカートは倒しておく（序盤で倒している）。</li>
+      </ol>
+    </article>
+
+    <article class="mode" id="mid">
+      <div class="mode-head"><span class="led c-teal"><i></i><b>2</b></span><h3>中盤</h3></div>
+      <dl>
+        <dt>開始</dt><dd>コトブキシティから204番道路に入ってすぐの「＜204＞」看板の前</dd>
+        <dt>終わり</dt><dd>ポケモンリーグに到着 → こうてつじま・ズイタウンの寄り道 → ノモセのサファリゲーム</dd>
+        <dt>入力</dt><dd>
+          水色3回
+          <ul>
+            <li>1回目：自転車の色（0回＝青、1回＝赤、2回＝黄、3回以上＝緑）。ハクタイでもらう自転車の色はあとから変えられない</li>
+            <li>2〜3回目：始めるパート番号の十の位 → 一の位（どちらも0回なら最初から）</li>
+          </ul>
+        </dd>
+      </dl>
+      <p class="note">スタート時に白の点滅で自転車の色を知らせる（1回＝青 … 4回＝緑）。</p>
+      <h3>途中から再開するとき</h3>
+      <ol>
+        <li>止まった場所が、下の表のどのパートかを確認する。</li>
+        <li>そのパートが終わるところまで手で進める（パートの途中からは再開できない）。</li>
+        <li>バッグ（むしよけスプレーの数、余計な道具）と、ゴウカザルの技の順番を確認する。</li>
+        <li>次のパートの番号を入力してスタートする。</li>
+      </ol>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>番号</th><th>パート</th></tr></thead>
+          <tbody>
+          <tr><td class="num">1</td><td>204番道路</td></tr>
+          <tr><td class="num">2</td><td>ソノオタウン</td></tr>
+          <tr><td class="num">3</td><td>205番道路</td></tr>
+          <tr><td class="num">4</td><td>ハクタイシティ</td></tr>
+          <tr><td class="num">5</td><td>206番道路</td></tr>
+          <tr><td class="num">6</td><td>ヨスガシティ</td></tr>
+          <tr><td class="num">7</td><td>209番道路</td></tr>
+          <tr><td class="num">8</td><td>210番道路（南）</td></tr>
+          <tr><td class="num">9</td><td>トバリシティ</td></tr>
+          <tr><td class="num">10</td><td>214番道路</td></tr>
+          <tr><td class="num">11</td><td>ノモセシティ</td></tr>
+          <tr><td class="num">12</td><td>210番道路（北）</td></tr>
+          <tr><td class="num">13</td><td>カンナギタウン</td></tr>
+          <tr><td class="num">14</td><td>ヨスガシティ（2回目）</td></tr>
+          <tr><td class="num">15</td><td>212番道路</td></tr>
+          <tr><td class="num">16</td><td>218番道路</td></tr>
+          <tr><td class="num">17</td><td>ミオシティ</td></tr>
+          <tr><td class="num">18</td><td>リッシ湖</td></tr>
+          <tr><td class="num">19</td><td>シンジ湖</td></tr>
+          <tr><td class="num">20</td><td>216番道路</td></tr>
+          <tr><td class="num">21</td><td>キッサキシティ</td></tr>
+          <tr><td class="num">22</td><td>エイチ湖</td></tr>
+          <tr><td class="num">23</td><td>トバリシティ（2回目）</td></tr>
+          <tr><td class="num">24</td><td>やりのはしら</td></tr>
+          <tr><td class="num">25</td><td>222番道路</td></tr>
+          <tr><td class="num">26</td><td>ナギサシティ</td></tr>
+          <tr><td class="num">27</td><td>223番道路</td></tr>
+          <tr><td class="num">28</td><td>チャンピオンロード</td></tr>
+          <tr><td class="num">29</td><td>こうてつじま（寄り道）</td></tr>
+          <tr><td class="num">30</td><td>ズイタウン（寄り道）</td></tr>
+          <tr><td class="num">31</td><td>サファリゲーム（寄り道）</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="mode" id="after">
+      <div class="mode-head"><h3>中盤のあとに手でやること</h3></div>
+      <ul>
+        <li>ライバル戦と四天王・チャンピオンは自分で戦う（強いポケモンを用意するのがおすすめ）。</li>
+        <li>シンオウ図鑑を150にする：湖の3匹、ディアルガかパルキアのもう一方、図鑑に載っていなければウパー（サファリ）・メノクラゲ（218番道路の水上）。</li>
+      </ul>
+    </article>
+    <a class="top-link" href="#top">早見表に戻る</a>
+  </section>
+</div>
+</body>
+</html>

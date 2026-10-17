@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
+<title>BDSP多機能マクロ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 1カラムの取扱説明書。上にLED早見表、下に機能ごとの項目。スマホ幅が基準 */
+:root {
+  --bg: #f3f6f8;
+  --surface: #ffffff;
+  --fg: #15202b;
+  --muted: #5a6875;
+  --line: #d7dee5;
+  --accent: #0b8796;
+  --accent-soft: #e2f4f6;
+  --ok: #17803d;
+  --ok-soft: #e3f4e8;
+  --warn: #9a5b00;
+  --warn-soft: #fbf0dc;
+  --code-bg: #edf1f4;
+  /* 本体のLEDの色（実物の色なので両テーマ共通） */
+  --led-white: #ffffff;
+  --led-amber: #ffaa00;
+  --led-green: #1fd25a;
+  --led-blue: #2f6bff;
+  --led-red: #ff3b3b;
+  --led-purple: #a855f7;
+  --led-cyan: #00d9f0;
+  --led-pink: #ff2fb0;
+  --led-orange: #ff6a00;
+  --led-teal: #00c8a0;
+  --font-display: "DotGothic16", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e141a; --surface: #151d25; --fg: #e5ecf2; --muted: #93a1ae; --line: #26323e;
+    --accent: #3cc6d6; --accent-soft: #12303a; --ok: #5fd68a; --ok-soft: #13301f;
+    --warn: #f1b453; --warn-soft: #33270f; --code-bg: #1c2731; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e141a; --surface: #151d25; --fg: #e5ecf2; --muted: #93a1ae; --line: #26323e;
+  --accent: #3cc6d6; --accent-soft: #12303a; --ok: #5fd68a; --ok-soft: #13301f;
+  --warn: #f1b453; --warn-soft: #33270f; --code-bg: #1c2731; color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15.5px;
+  line-height: 1.75;
+}
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+h1, h2, h3 { text-wrap: balance; line-height: 1.35; margin: 0; }
+h1 { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; letter-spacing: 0.02em; }
+h2 {
+  font-family: var(--font-display); font-weight: 400; font-size: 1.3rem;
+  padding-bottom: 8px; border-bottom: 1px solid var(--line);
+}
+h3 { font-size: 1.08rem; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--accent); }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+section { display: flex; flex-direction: column; gap: 16px; }
+.lead { color: var(--muted); }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+code, .key {
+  font-family: var(--font-mono); font-size: 0.88em; background: var(--code-bg);
+  padding: 1px 6px; border-radius: 4px;
+}
+ul, ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 4px; }
+
+/* LED表示: 色の丸 + 点滅回数の小さな点 */
+.led { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.led i {
+  width: 14px; height: 14px; border-radius: 50%; background: var(--c);
+  box-shadow: 0 0 0 1px var(--line), 0 0 8px color-mix(in srgb, var(--c) 70%, transparent);
+}
+.led b { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 0.95rem; font-weight: 500; line-height: 1; }
+.c-white { --c: var(--led-white); } .c-amber { --c: var(--led-amber); } .c-green { --c: var(--led-green); }
+.c-blue { --c: var(--led-blue); } .c-red { --c: var(--led-red); } .c-purple { --c: var(--led-purple); }
+.c-cyan { --c: var(--led-cyan); } .c-pink { --c: var(--led-pink); } .c-orange { --c: var(--led-orange); } .c-teal { --c: var(--led-teal); }
+
+/* 早見表 */
+.index { display: flex; flex-direction: column; gap: 14px; }
+.group { display: flex; flex-direction: column; gap: 6px; }
+.group-name { font-size: 0.8rem; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; }
+.rows { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); overflow: hidden; }
+.rows a {
+  display: grid; grid-template-columns: 76px 1fr; align-items: center; gap: 10px;
+  padding: 10px 12px; color: var(--fg); text-decoration: none; border-top: 1px solid var(--line);
+}
+.rows a:first-child { border-top: 0; }
+.rows a:hover { background: var(--accent-soft); }
+.rows .name { min-width: 0; }
+
+/* 状態 */
+.pill { font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.pill.ok { color: var(--ok); background: var(--ok-soft); }
+.pill.wip { color: var(--warn); background: var(--warn-soft); }
+
+/* 基本操作 */
+.ops { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.op { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.op .what { font-weight: 700; }
+.op .how { color: var(--muted); font-size: 0.92rem; }
+
+.window-demo { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.window-demo .slot {
+  font-family: var(--font-mono); font-size: 0.85rem; padding: 4px 10px; border-radius: 6px;
+  background: var(--accent-soft); color: var(--fg); border: 1px solid var(--line);
+}
+.window-demo .arrow { color: var(--muted); }
+
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+th, td { padding: 8px 12px; text-align: left; border-top: 1px solid var(--line); white-space: nowrap; }
+thead th { border-top: 0; color: var(--muted); font-weight: 500; font-size: 0.82rem; }
+td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+.steps { display: flex; flex-direction: column; gap: 12px; padding-left: 1.4em; }
+.steps li { padding-left: 4px; }
+.steps strong { display: block; }
+.steps span { display: block; color: var(--muted); font-size: 0.92rem; }
+td .led { margin-right: 6px; vertical-align: -2px; }
+
+/* 機能ごとの項目 */
+.mode {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 18px 16px; display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 16px;
+}
+.mode-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.mode-head h3 { flex: 1 1 auto; min-width: 0; }
+.mode dl { margin: 0; display: grid; grid-template-columns: 4.5em 1fr; gap: 6px 12px; }
+.mode dt { color: var(--muted); font-size: 0.85rem; padding-top: 2px; }
+.mode dd { margin: 0; min-width: 0; }
+.note { font-size: 0.88rem; color: var(--muted); }
+.callout { background: var(--warn-soft); border-radius: 8px; padding: 12px 14px; font-size: 0.92rem; }
+.top-link { font-size: 0.85rem; align-self: flex-end; }
+footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+
+@media (max-width: 420px) {
+  .mode dl { grid-template-columns: 1fr; gap: 2px; }
+  .mode dt { padding-top: 6px; }
+  .rows a { grid-template-columns: 64px 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rows a { transition: background 0.15s; }
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="top">
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <a href="./" style="font-size:0.88rem">← 説明書まとめ</a>
+    <h1>BDSP多機能マクロ</h1>
+  </header>
+
+  <section aria-labelledby="h-settings">
+    <h2 id="h-settings">先にやっておく設定</h2>
+    <ul>
+      <li>オプション：話の速さ はやい／戦闘アニメ みない／ニックネーム登録 しない／ボックスへ 自動で送る</li>
+      <li>メニュー（Xボタン）：左上に「ポケモン」、その真下（左下）に「タウンマップ」が来るように並べ替える</li>
+      <li>ゲームのバージョンは最新でOK（バグ技は使わない）</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-basic">
+    <h2 id="h-basic">使い方</h2>
+    <p class="note">押すのは基板の「BOOT」と書かれたボタン。「RESET」は押さない。登録中に青緑に光るのがBDSP多機能マクロ。</p>
+    <ol class="steps">
+      <li><strong>ゲーム側の準備をする</strong><span>下の「機能ごとの説明」にある開始位置・手持ちにしておく。ここまではいつものコントローラーで操作してOK。</span></li>
+      <li><strong>ボードをSwitchに挿す</strong><span>「コントローラー」→「持ちかた/順番を変える」を開いてから、ドックのUSB端子に挿す。LEDが青緑に光り、自動で登録される。点滅に変わったら完了。画面を閉じてゲームに戻る。</span></li>
+      <li><strong>ちょん押しで機能を選ぶ</strong><span>押すたびに次の機能に変わる。LEDの色と点滅の回数を、下の早見表で確認する。</span></li>
+      <li><strong>1秒長押しでスタート</strong><span>LEDが機能の色で光りっぱなしになったら動作中。回数を入れる機能は、先に水色の間に回数を入れる（下の「回数の入れ方」）。</span></li>
+      <li><strong>止めるときも1秒長押し</strong><span>終わりがある機能は、最後に本体がスリープする。</span></li>
+    </ol>
+    <h3>LEDの見方</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>光り方</th><th>状態</th></tr></thead>
+        <tbody>
+          <tr><td><span class="led c-teal"><i></i></span> 青緑で光りっぱなし</td><td>挿した直後。登録中</td></tr>
+          <tr><td>機能の色で点滅</td><td>待機中。点滅の回数と色で、選んでいる機能を表す</td></tr>
+          <tr><td>機能の色で光りっぱなし</td><td>動作中</td></tr>
+          <tr><td><span class="led c-cyan"><i></i></span> 水色</td><td>回数の入力待ち</td></tr>
+          <tr><td><span class="led c-white"><i></i></span> 白く一瞬光る</td><td>入力の1回を受け付けた</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-index">
+    <h2 id="h-index">LED早見表</h2>
+    <div class="index">
+      <div class="group">
+        <div class="group-name">共通</div>
+        <div class="rows">
+          <a href="#w1"><span class="led c-white"><i></i><b>1</b></span><span class="name">A連打</span></a>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-name">卵</div>
+        <div class="rows">
+          <a href="#y1"><span class="led c-amber"><i></i><b>1</b></span><span class="name">卵受取</span></a>
+          <a href="#y2"><span class="led c-amber"><i></i><b>2</b></span><span class="name">卵孵化</span></a>
+          <a href="#y3"><span class="led c-amber"><i></i><b>3</b></span><span class="name">卵受取＆孵化</span></a>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-name">ボックス</div>
+        <div class="rows">
+          <a href="#g1"><span class="led c-green"><i></i><b>1</b></span><span class="name">ボックス逃がし</span></a>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-name">育成・金策</div>
+        <div class="rows">
+          <a href="#b1"><span class="led c-blue"><i></i><b>1</b></span><span class="name">経験値稼ぎ（地下大洞窟）</span></a>
+          <a href="#b2"><span class="led c-blue"><i></i><b>2</b></span><span class="name">地下金策</span></a>
+          <a href="#b3"><span class="led c-blue"><i></i><b>3</b></span><span class="name">地下金策 設定</span></a>
+          <a href="#b4"><span class="led c-blue"><i></i><b>4</b></span><span class="name">ふれあい広場（きのみ集め）</span></a>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-name">コンテスト</div>
+        <div class="rows">
+          <a href="#r1"><span class="led c-red"><i></i><b>1</b></span><span class="name">コンテスト（マスターランク）</span></a>
+          <a href="#r2"><span class="led c-red"><i></i><b>2</b></span><span class="name">コンテスト タイミング調整</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-input">
+    <h2 id="h-input">回数の入れ方</h2>
+    <p>水色に光っている4秒間に押した回数が数字になる。</p>
+    <div class="window-demo" aria-label="入力の例">
+      <span class="led c-cyan"><i></i></span><span class="slot">1回目 = 10の位</span><span class="arrow">→</span>
+      <span class="led c-cyan"><i></i></span><span class="slot">2回目 = 1の位</span>
+    </div>
+    <ul>
+      <li>12 → 1回目に1回、2回目に2回。ボックス数は何も押さなければ 1。</li>
+    </ul>
+    <h3>卵のサイクル数</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>押す回数</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7以上</th></tr></thead>
+        <tbody><tr><th>サイクル</th><td class="num">40</td><td class="num">5</td><td class="num">10</td><td class="num">15</td><td class="num">20</td><td class="num">25</td><td class="num">30</td><td class="num">35</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-modes">
+    <h2 id="h-modes">機能ごとの説明</h2>
+
+    <article class="mode" id="w1">
+      <div class="mode-head"><span class="led c-white"><i></i><b>1</b></span><h3>A連打</h3></div>
+      <dl>
+        <dt>動き</dt><dd>Aボタンを押し続ける。</dd>
+        <dt>開始</dt><dd>どこでも</dd>
+        <dt>入力</dt><dd>なし</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="eggprep">
+      <div class="mode-head"><h3>卵の機能の共通準備</h3></div>
+      <ul>
+        <li>自転車を<strong>十字キー上</strong>（＋ボタンで出るリストの上）に登録。ギアはマッハにしておく。</li>
+        <li>ズイタウンの育て屋（はらっぱ）に、卵ができる2匹を預ける。</li>
+        <li><strong>ズイタウンのポケモンセンターの前</strong>に立ってスタートする（最初にズイタウンへ「そらをとぶ」して位置を合わせる）。</li>
+      </ul>
+    </article>
+
+    <article class="mode" id="y1">
+      <div class="mode-head"><span class="led c-amber"><i></i><b>1</b></span><h3>卵受取</h3></div>
+      <dl>
+        <dt>動き</dt><dd>育て屋の前で回って卵をもらう、をくり返す。ボックス数×30個もらったら本体がスリープする。</dd>
+        <dt>準備</dt><dd>手持ちを<strong>6匹</strong>にする（卵がボックスに送られるように）。空きボックスを用意する。</dd>
+        <dt>開始</dt><dd>ズイタウンのポケモンセンターの前</dd>
+        <dt>入力</dt><dd>水色2回：ボックス数（10の位 → 1の位）</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="y2">
+      <div class="mode-head"><span class="led c-amber"><i></i><b>2</b></span><h3>卵孵化</h3></div>
+      <dl>
+        <dt>動き</dt><dd>ボックスの卵を左の列から5個ずつ手持ちに入れ、育て屋の前で回って孵す。孵ったポケモンはボックスに戻す。終わったら本体がスリープする。</dd>
+        <dt>準備</dt><dd>
+          <ul>
+            <li>手持ちは とくせい「ほのおのからだ」などのポケモン<strong>1匹だけ</strong>。</li>
+            <li>卵で埋まったボックスを並べ、<strong>最初の卵のボックスを開いた状態で閉じておく</strong>。</li>
+            <li>同じ歩数の卵だけにする。</li>
+          </ul>
+        </dd>
+        <dt>開始</dt><dd>ズイタウンのポケモンセンターの前</dd>
+        <dt>入力</dt><dd>水色3回：サイクル数 → ボックス数の10の位 → 1の位</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="y3">
+      <div class="mode-head"><span class="led c-amber"><i></i><b>3</b></span><h3>卵受取＆孵化</h3></div>
+      <dl>
+        <dt>動き</dt><dd>先にボックス数×30個の卵をもらい、そのあと全部孵す。終わったら本体がスリープする。</dd>
+        <dt>準備</dt><dd>
+          <ul>
+            <li>手持ちの先頭を とくせい「ほのおのからだ」などのポケモン、2〜6番目を適当なポケモン（卵以外）にする。</li>
+            <li>ボックス1から、使うボックス数だけ空にする。さらにその1つ前のボックス（最後のボックス）に5匹分以上の空きを作る（手持ちの2〜6番目が入る）。</li>
+            <li>空にした<strong>ボックス1を開いた状態で閉じておく</strong>。</li>
+          </ul>
+        </dd>
+        <dt>開始</dt><dd>ズイタウンのポケモンセンターの前</dd>
+        <dt>入力</dt><dd>水色3回：サイクル数 → ボックス数の10の位 → 1の位</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="g1">
+      <div class="mode-head"><span class="led c-green"><i></i><b>1</b></span><h3>ボックス逃がし</h3></div>
+      <dl>
+        <dt>動き</dt><dd>ボックスのポケモンを左上から順に逃がす。指定したボックス数を逃がしたら止まる。</dd>
+        <dt>準備</dt><dd>逃がすボックスは30匹すべて埋めておく（空きやタマゴがあるとずれる）。</dd>
+        <dt>開始</dt><dd>ボックス画面で、カーソルを左上に合わせた状態（範囲選択ではなく、ふつうの選択）</dd>
+        <dt>入力</dt><dd>水色2回：ボックス数（10の位 → 1の位）</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="b1">
+      <div class="mode-head"><span class="led c-blue"><i></i><b>1</b></span><h3>経験値稼ぎ（地下大洞窟）</h3></div>
+      <dl>
+        <dt>動き</dt><dd>地下大洞窟の「ふぶきのくうどう」を左右に歩いて野生と戦い、PPが減ったら右下の山男（回復）に戻る、をくり返す。</dd>
+        <dt>準備</dt><dd>
+          <ul>
+            <li>手持ちの先頭：戦わせるポケモン。<strong>1番上の技</strong>は命中100の非接触技で、出てくる相手を2発以内で倒せるもの（草・虫・岩・悪・フェアリーがおすすめ。こだわりメガネなども）。</li>
+            <li>2〜6番目：育てたいポケモン。</li>
+            <li>ひみつきちに水（トドゼルガ）や氷の石像を置いて出現を寄せる。電気・鋼・岩の石像は避ける（がんじょうで長引く）。</li>
+          </ul>
+        </dd>
+        <dt>開始</dt><dd>キッサキシティから地下に入ったマップの右下、回復してくれる山男の<strong>左隣</strong></dd>
+        <dt>入力</dt><dd>水色1回：回復までの往復回数（使う技のPP÷2くらい。0回なら10）</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="b2">
+      <div class="mode-head"><span class="led c-blue"><i></i><b>2</b></span><h3>地下金策</h3></div>
+      <dl>
+        <dt>動き</dt><dd>トバリデパートで台座を買う → 地下の山男で台座を玉に替え、玉で技マシンに交換 → デパートで技マシンを売る、をくり返す。お小遣いがたまったら、設定に合わせてドーピングアイテムを買って続けるか、止まる。</dd>
+        <dt>準備</dt><dd>
+          <ul>
+            <li>探検セットを<strong>十字キー左</strong>（＋ボタンで出るリストの左）に登録。</li>
+            <li>その日の交換レートを地下の小さい玉交換の山男（トバリから入って南南西）で確認し、黒字になる技マシンを探す（下の表）。</li>
+            <li>その技マシンを1個以上交換して、バッグでお気に入りにし、技マシンの<strong>一番上</strong>に並べる。</li>
+            <li>四角い台座・円形の台座は持っていたら0個にする。ほかの台座は数個持っておく（バッグの台座が空にならないように）。</li>
+            <li>先に<a href="#b3">地下金策 設定</a>をする。</li>
+          </ul>
+        </dd>
+        <dt>開始</dt><dd>トバリデパートの入り口の前</dd>
+        <dt>入力</dt><dd>なし</dd>
+      </dl>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>売値</th><th>黒字になる玉の数</th><th>技マシン</th></tr></thead>
+          <tbody>
+            <tr><td class="num">2750円</td><td>30個以下</td><td>14,15,25,38,50,52,64,68,92</td></tr>
+            <tr><td class="num">1500円</td><td>17個以下</td><td>01,02,03,06,07,13,19,21,22,23,24,26,27,29,30,31,34,35,36,40,42,43,44,45,47,48,49,53,55,57,59,60,62,65,66,71,72,74,79,80,81,83,84,85,86,88,89,91</td></tr>
+            <tr><td class="num">1250円</td><td>15個以下</td><td>95,99</td></tr>
+            <tr><td class="num">1000円</td><td>11個以下</td><td>09,11,16,17,18,20,28,33,37,39,46,51,54,56,58,61,63,73,76,90,93,94,96,97,98,100</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">日付が変わると交換リストが変わるので、日をまたぐ前に止める。</p>
+    </article>
+
+    <article class="mode" id="b3">
+      <div class="mode-head"><span class="led c-blue"><i></i><b>3</b></span><h3>地下金策 設定</h3></div>
+      <p>交換レートが変わったときや、始める前にやる。値は保存される。</p>
+      <dl>
+        <dt>入力</dt><dd>
+          水色9回
+          <ul>
+            <li>1回目：技マシンの売値（1回＝2750円／2回＝1500円／3回＝1250円／4回＝1000円）</li>
+            <li>2回目：玉の色（0回＝赤／1回以上＝青）</li>
+            <li>3〜4回目：玉の個数の十の位 → 一の位</li>
+            <li>5回目：その技マシンが交換リストの上から何段目か（0回なら10）</li>
+            <li>6〜8回目：今の所持金（千円単位）の百の位 → 十の位 → 一の位（1万円なら 0・1・0）</li>
+            <li>9回目：お小遣いがたまったら（0回＝ドーピングアイテムを買って続ける／1回以上＝技マシンを売って止まる）</li>
+          </ul>
+        </dd>
+        <dt>結果</dt><dd>黄（売値）→ 白（1回＝赤／2回＝青）→ 水色（玉の個数）→ 緑（段）→ 青（所持金）の順に点滅で知らせる。0は長く1回。</dd>
+      </dl>
+      <p class="note">売値・玉の個数・所持金は、0回のままだと前の値が残る。所持金は毎回入れ直す。</p>
+    </article>
+
+    <article class="mode" id="b4">
+      <div class="mode-head"><span class="led c-blue"><i></i><b>4</b></span><h3>ふれあい広場（きのみ集め）</h3></div>
+      <dl>
+        <dt>動き</dt><dd>ポケモン6匹を連れて広場を回り、1匹ずつ話しかけて拾ったきのみやボールを受け取る、をくり返す。</dd>
+        <dt>準備</dt><dd>手持ちをブイズの進化形6匹にする（先頭だけは足の速い別のポケモンでもOK）。シャワーズはダイブボールを拾ってくることがある。広場に入ったら＋ボタン（口笛）で全員呼ぶ。</dd>
+        <dt>開始</dt><dd>広場の左下、受付のお姉さんの視線の先にある白いフェンスの右側</dd>
+        <dt>入力</dt><dd>なし</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="r1">
+      <div class="mode-head"><span class="led c-red"><i></i><b>1</b></span><h3>コンテスト（マスターランク）</h3></div>
+      <dl>
+        <dt>動き</dt><dd>マスターランクに出て、ダンスのリズムに合わせてAを押す、をくり返す。3回に1回くらい優勝できる。</dd>
+        <dt>準備</dt><dd>
+          <ul>
+            <li>全部門のノーマル〜ウルトラをクリアして、マスターランクに出られるようにする。</li>
+            <li>出るポケモンを手持ちの<strong>先頭</strong>にして、ポフィンでコンディションとけづやを上げておく。技の一番上を効果の高い技にする（ギガインパクトがおすすめ）。</li>
+            <li>ボールカプセルを部門ごとに用意する。カプセル選択の<strong>1段目</strong>に左から かっこよさ・うつくしさ・かわいさ・かしこさ、<strong>2段目</strong>に たくましさ・ブリリアントシャイニング。部門に合ったシールを20枚ずつ貼る。</li>
+            <li>コンテスト会場で受付（中央）を向いてレポート。メニューのカーソルはトレーナーカードに合わせておく。</li>
+            <li>先に<a href="#r2">タイミング調整</a>でかっこよさを合わせる。</li>
+          </ul>
+        </dd>
+        <dt>開始</dt><dd>コンテスト会場の受付（中央）の前</dd>
+        <dt>入力</dt><dd>水色1回：部門
+          <ul>
+            <li>0回：かっこよさ〜たくましさを5回ずつ → ブリリアントシャイニングをずっとくり返す（リボン集め）</li>
+            <li>1回 かっこよさ／2回 うつくしさ／3回 かわいさ／4回 かしこさ／5回 たくましさ／6回 ブリリアントシャイニング：その部門だけくり返す</li>
+          </ul>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="r2">
+      <div class="mode-head"><span class="led c-red"><i></i><b>2</b></span><h3>コンテスト タイミング調整</h3></div>
+      <p>ロード時間は本体ごとに違うので、最初に合わせる。値は保存される。</p>
+      <ol>
+        <li>コンテストを部門1（かっこよさ）で何回か動かして見る。曲の2小節目の2拍目（空白）で技が出るのが正しいタイミング。</li>
+        <li>入力が早いなら遅らせる、遅いなら早める（1拍＝0.6秒）。毎回0.5秒くらいぶれるので、何回か見て平均で決める。</li>
+        <li>かっこよさが5回以内に優勝できればOK。</li>
+      </ol>
+      <dl>
+        <dt>入力</dt><dd>水色2回：遅らせる回数 → 早める回数（1回＝0.1秒）。どちらも0回なら元に戻す。</dd>
+        <dt>結果</dt><dd>今の調整量を点滅で知らせる（白＝遅らせた0.1秒の数／黄＝早めた0.1秒の数／水色1回＝元のまま）</dd>
+      </dl>
+    </article>
+
+    <a class="top-link" href="#top">早見表に戻る</a>
+  </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
+<title>ポケモンマクロ説明書</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Layout: 1カラム。上に共通の使い方、下にプログラムごとのカード（挿したときのLEDの色で見分ける）。各説明書と同じ見た目 */
+:root {
+  --bg: #f3f6f8;
+  --surface: #ffffff;
+  --fg: #15202b;
+  --muted: #5a6875;
+  --line: #d7dee5;
+  --accent: #0b8796;
+  --accent-soft: #e2f4f6;
+  /* 本体のLEDの色（実物の色なので両テーマ共通） */
+  --led-blue: #2f6bff;
+  --led-pink: #ff2fb0;
+  --led-orange: #ff6a00;
+  --led-teal: #00c8a0;
+  --led-violet: #7c3aed;
+  --led-lime: #84cc16;
+  --font-display: "DotGothic16", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e141a; --surface: #151d25; --fg: #e5ecf2; --muted: #93a1ae; --line: #26323e;
+    --accent: #3cc6d6; --accent-soft: #12303a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e141a; --surface: #151d25; --fg: #e5ecf2; --muted: #93a1ae; --line: #26323e;
+  --accent: #3cc6d6; --accent-soft: #12303a; color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15.5px;
+  line-height: 1.75;
+}
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+h1, h2, h3 { text-wrap: balance; line-height: 1.35; margin: 0; }
+h1 { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; letter-spacing: 0.02em; }
+h2 {
+  font-family: var(--font-display); font-weight: 400; font-size: 1.3rem;
+  padding-bottom: 8px; border-bottom: 1px solid var(--line);
+}
+h3 { font-size: 1.1rem; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+section { display: flex; flex-direction: column; gap: 14px; }
+ul, ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 4px; }
+.lead { color: var(--muted); }
+
+/* 共通の操作 */
+.ops { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.op { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.op .how { font-weight: 700; }
+.op .what { color: var(--muted); font-size: 0.9rem; }
+
+/* プログラムのカード */
+.programs { display: flex; flex-direction: column; gap: 12px; }
+.prog {
+  display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: start;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 16px; color: var(--fg); text-decoration: none;
+}
+.prog:hover { border-color: var(--c); }
+.dot {
+  grid-row: span 3; width: 18px; height: 18px; margin-top: 5px; border-radius: 50%; background: var(--c);
+  box-shadow: 0 0 0 1px var(--line), 0 0 10px color-mix(in srgb, var(--c) 70%, transparent);
+}
+.prog .games { color: var(--muted); font-size: 0.9rem; }
+.prog .items { font-size: 0.92rem; min-width: 0; }
+.prog .open { grid-column: 2; font-size: 0.88rem; color: var(--accent); font-weight: 500; }
+.c-blue { --c: var(--led-blue); } .c-pink { --c: var(--led-pink); } .c-orange { --c: var(--led-orange); }
+.c-teal { --c: var(--led-teal); } .c-violet { --c: var(--led-violet); } .c-lime { --c: var(--led-lime); }
+.note { font-size: 0.88rem; color: var(--muted); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .prog { transition: border-color 0.15s; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <h1>ポケモンマクロ説明書</h1>
+  </header>
+
+  <section aria-labelledby="h-ops">
+    <h2 id="h-ops">ボタンの操作（全部共通）</h2>
+    <div class="ops">
+      <div class="op"><span class="how">ちょん押し</span><span class="what">次の機能へ</span></div>
+      <div class="op"><span class="how">素早く2回押し</span><span class="what">次の作品へ（作品が2つ以上あるもの）</span></div>
+      <div class="op"><span class="how">1秒長押し</span><span class="what">スタート／ストップ</span></div>
+      <div class="op"><span class="how">水色の間に押す</span><span class="what">回数の入力（4秒間）</span></div>
+    </div>
+    <p class="note">押すのは基板の「BOOT」。挿すときは「コントローラー」→「持ちかた/順番を変える」を開いてから。</p>
+  </section>
+
+  <section aria-labelledby="h-programs">
+    <h2 id="h-programs">プログラムと説明書</h2>
+    <p>持っているマイコンに合った説明書を選んでください。どれか分からないときは、挿したときのLEDの色で見分けられます。</p>
+    <div class="programs">
+      <a class="prog c-blue" href="swsh.html">
+        <span class="dot" aria-hidden="true"></span>
+        <h3>剣盾多機能</h3>
+        <span class="games">剣盾 ／ 設定　・　挿したときのLED：青</span>
+        <span class="items">卵受取・孵化、ボックス逃がし、カセキ、ワット、IDくじ、年数変更、ポケジョブ、レイド、バトルタワー、トーナメント</span>
+        <span class="open">説明書を開く →</span>
+      </a>
+      <a class="prog c-pink" href="shiny.html">
+        <span class="dot" aria-hidden="true"></span>
+        <h3>色違い</h3>
+        <span class="games">剣盾 ／ BDSP ／ FRLG　・　挿したときのLED：ピンク</span>
+        <span class="items">レジ系、強いシンボル、シェイミ、ダークライ、アルセウス、あまいかおり、サンダー、フリーザー、ファイヤー、デオキシス</span>
+        <span class="open">説明書を開く →</span>
+      </a>
+      <a class="prog c-orange" href="story.html">
+        <span class="dot" aria-hidden="true"></span>
+        <h3>ストーリー</h3>
+        <span class="games">剣盾 ／ BDSP　・　挿したときのLED：オレンジ</span>
+        <span class="items">剣盾 序盤・中盤以降・ザシアン／ザマゼンタ・バドレックス、BDSP 序盤・中盤</span>
+        <span class="open">説明書を開く →</span>
+      </a>
+      <a class="prog c-teal" href="bdsp.html">
+        <span class="dot" aria-hidden="true"></span>
+        <h3>BDSP多機能</h3>
+        <span class="games">BDSP　・　挿したときのLED：青緑</span>
+        <span class="items">卵受取・孵化、ボックス逃がし、経験値稼ぎ、地下金策、ふれあい広場、コンテスト</span>
+        <span class="open">説明書を開く →</span>
+      </a>
+      <a class="prog c-violet" href="sv.html">
+        <span class="dot" aria-hidden="true"></span>
+        <h3>SV多機能</h3>
+        <span class="games">スカーレット・バイオレット　・　挿したときのLED：すみれ色</span>
+        <span class="items">卵受取・孵化、ボックス逃がし、競り、コレクレーのコイン、どうぐプリンター、学校最強大会、テラレイド ホスト、BP集め、素材集め</span>
+        <span class="open">説明書を開く →</span>
+      </a>
+      <a class="prog c-lime" href="za.html">
+        <span class="dot" aria-hidden="true"></span>
+        <h3>ZA多機能</h3>
+        <span class="games">レジェンズZA　・　挿したときのLED：ライム</span>
+        <span class="items">ベンチ色厳選、ワイルドゾーン、異次元ゾーン、建物出入り、ドーナツ、ショップ購入、レストラン、ユカリトーナメント</span>
+        <span class="open">説明書を開く →</span>
+      </a>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-console">
+    <h2 id="h-console">Switch 1 で使うとき</h2>
+    <ul>
+      <li>最初は Switch 2 向けになっている。</li>
+      <li>日付やロード時間を使うプログラム（剣盾多機能・SV・ZA）は、各説明書の「本体切替」で Switch 1 に切り替える。</li>
+      <li>挿した直後の白の点滅で今の設定が分かる（1回＝Switch 1、2回＝Switch 2）。</li>
+    </ul>
+  </section>
+</div>
+</body>
+</html>
