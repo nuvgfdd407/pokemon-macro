@@ -163,6 +163,29 @@ footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction:
 @media (prefers-reduced-motion: no-preference) {
   .rows a { transition: background 0.15s; }
 }
+
+/* v2: 点滅の回数を点の数で見せる（点の数＝1周の点滅回数） */
+.blink { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; min-width: 0; vertical-align: -2px; }
+.blink i {
+  width: 12px; height: 12px; border-radius: 50%; background: var(--c);
+  box-shadow: 0 0 0 1px var(--line), 0 0 6px color-mix(in srgb, var(--c) 70%, transparent);
+}
+.rows a { grid-template-columns: 84px 1fr; }
+.mode-head .blink i { width: 14px; height: 14px; }
+.mode .what { font-size: 1rem; }
+.mode h4 { margin: 0; font-size: 0.92rem; color: var(--muted); font-weight: 700; }
+.mode dl { grid-template-columns: 6.5em 1fr; }
+ul.check { list-style: none; padding-left: 0; }
+ul.check li { position: relative; padding-left: 1.5em; }
+ul.check li::before {
+  content: ""; position: absolute; left: 0.1em; top: 0.45em; width: 0.8em; height: 0.8em;
+  border: 1.5px solid var(--accent); border-radius: 3px;
+}
+ol.q { padding-left: 1.6em; }
+ol.q li::marker { color: var(--accent); font-weight: 700; }
+.ex { display: block; margin-top: 6px; font-size: 0.88rem; color: var(--muted); background: var(--code-bg); border-radius: 6px; padding: 6px 10px; }
+.callout { line-height: 1.9; }
+@media (max-width: 420px) { .rows a { grid-template-columns: 70px 1fr; } }
 </style>
 </head>
 <body>
@@ -172,114 +195,349 @@ footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction:
     <h1>剣盾多機能マクロ Switch・Switch 2</h1>
   </header>
 
-  <section aria-labelledby="h-settings">
-    <h2 id="h-settings">先にやっておく設定</h2>
-    <ul>
-      <li>オプション：話の速さ はやい／戦闘アニメ みない／ニックネーム登録 しない／手持ち・ボックス 自動で送る／ちょいらく しない</li>
-      <li>青の機能：本体の「インターネットで時刻を合わせる」オフ</li>
-      <li>卵の機能：自転車のチャージ最大、メニューのアイコンは初期配置、インターネット切断</li>
-      <li>本体の種類：Switch 1（Lite含む）で使うときは、<a href="#p1">設定の「本体切替」</a>で切り替える。最初は Switch 2</li>
-    </ul>
+  <section aria-labelledby="h-btn">
+    <h2 id="h-btn">ボタンは1つだけ</h2>
+    <p>ボードの「<b>BOOT</b>」と書かれたボタンを使います（「RESET」は押さない）。押し方は3つだけです。</p>
+    <div class="ops">
+      <div class="op"><span class="how">ちょん押し</span><span class="what">次の機能に変える</span></div>
+      <div class="op"><span class="how">1秒長押し</span><span class="what">スタート ／ ストップ</span></div>
+      <div class="op"><span class="how">素早く2回押し</span><span class="what">「剣盾」と「設定」を切り替える</span></div>
+    </div>
   </section>
 
-  <section aria-labelledby="h-basic">
-    <h2 id="h-basic">使い方</h2>
-    <p class="note">押すのは基板の「BOOT」と書かれたボタン。「RESET」は押さない。</p>
+  <section aria-labelledby="h-flow">
+    <h2 id="h-flow">使う流れ</h2>
     <ol class="steps">
-      <li><strong>ゲーム側の準備をする</strong><span>下の「機能ごとの説明」にある開始位置・手持ちにしておく。ここまではいつものコントローラーで操作してOK。</span></li>
-      <li><strong>ボードをSwitchに挿す</strong><span>「コントローラー」→「持ちかた/順番を変える」を開いてから、ドックのUSB端子に挿す。LEDが青く光り、自動で登録される。続けて白の点滅で本体の設定を知らせる（1回＝Switch 1、2回＝Switch 2）。点滅に変わったら完了。画面を閉じてゲームに戻る。</span></li>
-      <li><strong>ちょん押しで機能を選ぶ</strong><span>押すたびに次の機能に変わる。LEDの色と点滅の回数を、下の早見表で確認する。</span></li>
-      <li><strong>素早く2回押すと作品が変わる</strong><span>剣盾 → 設定 → 剣盾…の順。切り替えると作品の色で3回速く光る（剣盾＝赤、設定＝紫）。</span></li>
-      <li><strong>1秒長押しでスタート</strong><span>LEDが機能の色で光りっぱなしになったら動作中。回数指定の機能は、先に水色の間に回数を入れる（下の「回数の入れ方」）。</span></li>
-      <li><strong>止めるときも1秒長押し</strong><span>決まった回数で終わる機能は、終わると自動で止まって点滅に戻る。</span></li>
-      <li><strong>使い終わったら抜く</strong><span>選んでいた機能は保存されるので、次に挿したときも同じ機能になっている。</span></li>
+      <li><strong>ゲームの中で準備する</strong><span>下の機能の説明にある「スタート前にやること」を、いつものコントローラーでやっておく。</span></li>
+      <li><strong>ボードをSwitchに挿す</strong><span>先に「コントローラー」→「持ちかた/順番を変える」を開いてから、ドックのUSBに挿す。LEDが青く光って自動で登録される。画面を閉じてゲームに戻る。</span></li>
+      <li><strong>ちょん押しで機能を選ぶ</strong><span>LEDが「色」と「点滅の回数」で今の機能を教えてくれる。下の一覧と見比べて、使いたい機能になるまでちょん押しする。</span></li>
+      <li><strong>1秒長押しでスタート</strong><span>回数を聞く機能は、LEDが<b>水色</b>になる。下の「回数の入れ方」のとおりに押す。LEDが機能の色で光りっぱなしになったら動いている。</span></li>
+      <li><strong>止めるときも1秒長押し</strong><span>回数を決めた機能は、終わると自動で止まる。</span></li>
     </ol>
-    <h3>LEDの見方</h3>
-    <div class="table-scroll">
-      <table>
-        <thead><tr><th>光り方</th><th>状態</th></tr></thead>
-        <tbody>
-          <tr><td><span class="led c-blue"><i></i></span> 青で光りっぱなし</td><td>挿した直後。登録中</td></tr>
-          <tr><td><span class="led c-white"><i></i></span> 白で1回か2回点滅</td><td>登録の直後。本体の設定（1回＝Switch 1、2回＝Switch 2）</td></tr>
-          <tr><td>作品の色で3回速く光る</td><td>作品を切り替えた（剣盾＝赤、設定＝紫）</td></tr>
-          <tr><td>機能の色で点滅</td><td>待機中。点滅の回数と色で、選んでいる機能を表す</td></tr>
-          <tr><td>機能の色で光りっぱなし</td><td>動作中</td></tr>
-          <tr><td><span class="led c-cyan"><i></i></span> 水色</td><td>回数の入力待ち</td></tr>
-          <tr><td><span class="led c-white"><i></i></span> 白く一瞬光る</td><td>入力の1回を受け付けた</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <p class="note">選んでいた機能は覚えているので、次に挿したときも同じ機能から始まる。</p>
   </section>
 
   <section aria-labelledby="h-index">
-    <h2 id="h-index">LED早見表</h2>
-    <p class="note">停止中はLEDが「機能の色」で「番号の回数」だけ点滅をくり返します。色と点の数で機能を探してください。</p>
-    <h3>剣盾</h3>
+    <h2 id="h-index">機能の一覧</h2>
+    <p>止まっているあいだ、LEDは機能の色で<b>点の数だけ</b>点滅をくり返します。たとえば <span class="blink c-amber" aria-hidden="true"><i></i><i></i></span> は「黄色が2回ずつ点滅」＝ 卵孵化。</p>
     <div class="index">
       <div class="group">
-        <div class="group-name">共通</div>
+        <div class="group-name">剣盾（LEDの色で種類が分かれる）</div>
         <div class="rows">
-          <a href="#w1"><span class="led c-white"><i></i><b>1</b></span><span class="name">A連打</span></a>
+          <a href="#w1"><span class="blink c-white" aria-label="白1回"><i></i></span><span class="name">A連打</span></a>
+          <a href="#y1"><span class="blink c-amber" aria-label="黄1回"><i></i></span><span class="name">卵を受け取る</span></a>
+          <a href="#y2"><span class="blink c-amber" aria-label="黄2回"><i></i><i></i></span><span class="name">卵を孵す</span></a>
+          <a href="#y3"><span class="blink c-amber" aria-label="黄3回"><i></i><i></i><i></i></span><span class="name">卵を受け取って孵す</span></a>
+          <a href="#y4"><span class="blink c-amber" aria-label="黄4回"><i></i><i></i><i></i><i></i></span><span class="name">ぐるぐる孵化（手持ちの卵だけ）</span></a>
+          <a href="#g1"><span class="blink c-green" aria-label="緑1回"><i></i></span><span class="name">ボックスのポケモンを逃がす</span></a>
+          <a href="#g2"><span class="blink c-green" aria-label="緑2回"><i></i><i></i></span><span class="name">カセキ復元</span></a>
+          <a href="#b1"><span class="blink c-blue" aria-label="青1回"><i></i></span><span class="name">ワット稼ぎ</span></a>
+          <a href="#b2"><span class="blink c-blue" aria-label="青2回"><i></i><i></i></span><span class="name">IDくじ</span></a>
+          <a href="#b3"><span class="blink c-blue" aria-label="青3回"><i></i><i></i><i></i></span><span class="name">年数変更（巣穴を進める）</span></a>
+          <a href="#b4"><span class="blink c-blue" aria-label="青4回"><i></i><i></i><i></i><i></i></span><span class="name">ポケジョブ</span></a>
+          <a href="#r1"><span class="blink c-red" aria-label="赤1回"><i></i></span><span class="name">レイド周回</span></a>
+          <a href="#r2"><span class="blink c-red" aria-label="赤2回"><i></i><i></i></span><span class="name">バトルタワー</span></a>
+          <a href="#r3"><span class="blink c-red" aria-label="赤3回"><i></i><i></i><i></i></span><span class="name">トーナメント</span></a>
         </div>
       </div>
       <div class="group">
-        <div class="group-name">卵</div>
+        <div class="group-name">設定（素早く2回押しで切り替え。LEDは紫）</div>
         <div class="rows">
-          <a href="#y1"><span class="led c-amber"><i></i><b>1</b></span><span class="name">卵受取・回数指定</span></a>
-          <a href="#y2"><span class="led c-amber"><i></i><b>2</b></span><span class="name">卵孵化・回数指定</span></a>
-          <a href="#y3"><span class="led c-amber"><i></i><b>3</b></span><span class="name">卵受取＆孵化・回数指定</span></a>
-          <a href="#y4"><span class="led c-amber"><i></i><b>4</b></span><span class="name">ぐるぐる孵化</span></a>
-        </div>
-      </div>
-      <div class="group">
-        <div class="group-name">ボックス・カセキ</div>
-        <div class="rows">
-          <a href="#g1"><span class="led c-green"><i></i><b>1</b></span><span class="name">ボックス逃がし・回数指定</span></a>
-          <a href="#g2"><span class="led c-green"><i></i><b>2</b></span><span class="name">カセキ復元</span></a>
-        </div>
-      </div>
-      <div class="group">
-        <div class="group-name">日付を使う機能</div>
-        <div class="rows">
-          <a href="#b1"><span class="led c-blue"><i></i><b>1</b></span><span class="name">ワット稼ぎ</span></a>
-          <a href="#b2"><span class="led c-blue"><i></i><b>2</b></span><span class="name">IDくじ回収</span></a>
-          <a href="#b3"><span class="led c-blue"><i></i><b>3</b></span><span class="name">年数変更・回数指定</span></a>
-          <a href="#b4"><span class="led c-blue"><i></i><b>4</b></span><span class="name">ポケジョブ</span></a>
-        </div>
-      </div>
-      <div class="group">
-        <div class="group-name">バトル</div>
-        <div class="rows">
-          <a href="#r1"><span class="led c-red"><i></i><b>1</b></span><span class="name">レイド周回</span></a>
-          <a href="#r2"><span class="led c-red"><i></i><b>2</b></span><span class="name">バトルタワー</span></a>
-          <a href="#r3"><span class="led c-red"><i></i><b>3</b></span><span class="name">トーナメント</span></a>
+          <a href="#p1"><span class="blink c-purple" aria-label="紫1回"><i></i></span><span class="name">Switch 1 ／ Switch 2 の切り替え</span></a>
+          <a href="#p2"><span class="blink c-purple" aria-label="紫2回"><i></i><i></i></span><span class="name">日付を1日進めるテスト</span></a>
+          <a href="#p3"><span class="blink c-purple" aria-label="紫3回"><i></i><i></i><i></i></span><span class="name">年を1つ進めるテスト</span></a>
         </div>
       </div>
     </div>
-    <h3>設定</h3>
-    <div class="index">
-      <div class="group">
-        <div class="rows">
-          <a href="#p1"><span class="led c-purple"><i></i><b>1</b></span><span class="name">本体切替（Switch 2 ⇔ Switch 1）</span></a>
-          <a href="#p2"><span class="led c-purple"><i></i><b>2</b></span><span class="name">日付+1 テスト</span></a>
-          <a href="#p3"><span class="led c-purple"><i></i><b>3</b></span><span class="name">年+1 テスト</span></a>
-        </div>
-      </div>
-    </div>
+    <p class="note">青の機能（ワット・IDくじ・年数変更・ポケジョブ）は本体の日付を変えながら動きます。</p>
   </section>
-
 
   <section aria-labelledby="h-input">
     <h2 id="h-input">回数の入れ方</h2>
-    <p>水色に光っている4秒間に押した回数が数字になる。</p>
-    <div class="window-demo" aria-label="入力の例">
-      <span class="led c-cyan"><i></i></span><span class="slot">1回目 = 10の位</span><span class="arrow">→</span>
-      <span class="led c-cyan"><i></i></span><span class="slot">2回目 = 1の位</span>
-    </div>
+    <p>スタートすると、機能によってはLEDが<b>水色</b>になって数を聞いてきます。</p>
     <ul>
-      <li>12 → 1回目に1回、2回目に2回。何も押さなければ 1。</li>
+      <li>水色のあいだ（4秒）に押した回数が、その数になる。押すたびに白く光る。</li>
+      <li>何も押さなければ <b>0</b>。</li>
+      <li>水色が一度消えて、また水色になったら次の質問。</li>
     </ul>
-    <h3>卵のサイクル数</h3>
+    <div class="callout">
+      <b>例：「ボックス数」を 12 にしたいとき</b>（質問が2回くる）<br>
+      1回目の水色 → <b>1回</b>押す（10の位）<br>
+      2回目の水色 → <b>2回</b>押す（1の位）<br>
+      3ボックスなら、1回目は押さずに待って、2回目に3回押す。
+    </div>
+  </section>
+
+  <section aria-labelledby="h-settings">
+    <h2 id="h-settings">最初に1回だけやっておくこと</h2>
+    <ul class="check">
+      <li>ゲームのオプション：話の速さ「はやい」／戦闘アニメ「みない」／ニックネーム登録「しない」／手持ち・ボックス「自動で送る」／ちょいらく「しない」</li>
+      <li>青の機能を使うなら：本体の設定で「インターネットで時刻を合わせる」をオフ</li>
+      <li>卵の機能を使うなら：自転車のチャージを最大にする／メニューのアイコンの並びは初期のまま／インターネットは切っておく</li>
+      <li>Switch 1・Lite で使うなら：<a href="#p1">Switch 1 ／ Switch 2 の切り替え</a>で Switch 1 にする（最初は Switch 2）</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-modes">
+    <h2 id="h-modes">機能ごとの説明</h2>
+
+    <article class="mode" id="w1">
+      <div class="mode-head"><span class="blink c-white" aria-label="白1回"><i></i></span><h3>A連打</h3></div>
+      <p class="what">Aボタンを押し続ける。会話送りや穴掘り兄弟などに。</p>
+      <dl>
+        <dt>スタート位置</dt><dd>どこでも</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="y1">
+      <div class="mode-head"><span class="blink c-amber" aria-label="黄1回"><i></i></span><h3>卵を受け取る</h3></div>
+      <p class="what">5番道路の預かり屋で、自転車で走っては卵をもらう、をくり返す。卵はボックスに入る。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>5番道路の預かり屋に親を2匹預ける</li>
+        <li>手持ちを6匹にする（卵は入れない）</li>
+        <li>空のボックスを用意して、ボックスを閉じるときは最初の空きボックスを開いた状態にしておく</li>
+        <li>Xメニューのカーソルを「タウンマップ」に合わせて閉じる</li>
+      </ul>
+      <dl>
+        <dt>スタート位置</dt><dd>5番道路で、自転車に乗った状態</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>ボックス数の10の位</li>
+            <li>ボックス数の1の位</li>
+          </ol>
+          <span class="ex">例：2ボックス分 → ①押さない ②2回。1ボックスで30回もらおうとする</span>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="y2">
+      <div class="mode-head"><span class="blink c-amber" aria-label="黄2回"><i></i><i></i></span><h3>卵を孵す</h3></div>
+      <p class="what">ボックスの卵を5個ずつ手持ちに入れ、預かり屋の近くの橋で走り回って孵す。孵ったポケモンはボックスに戻す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>手持ちは特性「ほのおのからだ」などのポケモン<b>1匹だけ</b></li>
+        <li>卵でいっぱいのボックスを並べ、最初の卵のボックスを開いた状態でボックスを閉じる</li>
+        <li>卵は同じ種類（同じ歩数）だけにする。混ざると失敗する</li>
+        <li>Xメニューのカーソルを「ポケモン」に合わせて閉じる</li>
+      </ul>
+      <dl>
+        <dt>スタート位置</dt><dd>5番道路で、自転車に乗った状態</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>卵のサイクル数（<a href="#cycle">下の表</a>）</li>
+            <li>ボックス数の10の位</li>
+            <li>ボックス数の1の位</li>
+          </ol>
+          <span class="ex">例：サイクル20の卵を3ボックス → ①4回 ②押さない ③3回</span>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="y3">
+      <div class="mode-head"><span class="blink c-amber" aria-label="黄3回"><i></i><i></i><i></i></span><h3>卵を受け取って孵す</h3></div>
+      <p class="what">卵を1個もらっては走り、5個そろったら孵るまで走る。孵った5匹はボックスに預ける。決めたボックス数が埋まったら止まる。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>ワイルドエリア「ハシノマはらっぱ」の預かり屋に親を2匹預ける</li>
+        <li>手持ちは特性「ほのおのからだ」などのポケモン<b>1匹だけ</b></li>
+        <li>孵すポケモンを図鑑に登録しておく</li>
+        <li>空のボックスを並べ、ボックスのカーソルを最初の空きボックスの左上に合わせておく</li>
+        <li>Xメニューのカーソルを「タウンマップ」に合わせて閉じる</li>
+      </ul>
+      <dl>
+        <dt>スタート位置</dt><dd>ハシノマはらっぱの預かり屋の近くで、自転車に乗った状態</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>卵のサイクル数（<a href="#cycle">下の表</a>）</li>
+            <li>ボックス数の10の位</li>
+            <li>ボックス数の1の位</li>
+          </ol>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="y4">
+      <div class="mode-head"><span class="blink c-amber" aria-label="黄4回"><i></i><i></i><i></i><i></i></span><h3>ぐるぐる孵化</h3></div>
+      <p class="what">その場でぐるぐる走り続けて、手持ちの卵を孵す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>手持ちの1番目に特性「ほのおのからだ」などのポケモン、2〜6番目に卵</li>
+      </ul>
+      <dl>
+        <dt>スタート位置</dt><dd>ワイルドエリアなどの広い場所で、自転車に乗った状態</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+        <dt>止め方</dt><dd>全部孵ったら1秒長押し</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="g1">
+      <div class="mode-head"><span class="blink c-green" aria-label="緑1回"><i></i></span><h3>ボックスのポケモンを逃がす</h3></div>
+      <p class="what">ボックスのポケモンを左上から順に逃がす。決めたボックス数を逃がしたら止まる。<b>逃がしたポケモンは戻らない。</b></p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>逃がすボックスは30匹すべて埋める（空きや卵があるとずれる）</li>
+      </ul>
+      <dl>
+        <dt>スタート位置</dt><dd>ボックス画面で、赤いカーソルを左上に合わせた状態</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>ボックス数の10の位</li>
+            <li>ボックス数の1の位</li>
+          </ol>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="g2">
+      <div class="mode-head"><span class="blink c-green" aria-label="緑2回"><i></i><i></i></span><h3>カセキ復元</h3></div>
+      <p class="what">研究者に話しかけてカセキを復元し、ボックスに送る、をくり返す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>バッグにカセキを4種類そろえる</li>
+        <li>オプションの手持ち・ボックスを「自動で送る」にする</li>
+      </ul>
+      <dl>
+        <dt>スタート位置</dt><dd>6番道路の研究者（ウカッツ）の前</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>上半分：押さない＝トリ ／ 1回以上＝サカナ</li>
+            <li>下半分：押さない＝リュウ ／ 1回以上＝クビナガ</li>
+            <li>復元する回数の100の位</li>
+            <li>復元する回数の10の位</li>
+            <li>復元する回数の1の位</li>
+          </ol>
+          <span class="ex">例：パッチラゴン（トリ＋リュウ）を30回 → ①押さない ②押さない ③押さない ④3回 ⑤押さない</span>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="b1">
+      <div class="mode-head"><span class="blink c-blue" aria-label="青1回"><i></i></span><h3>ワット稼ぎ</h3></div>
+      <p class="what">巣穴を調べてワットをもらう → 日付を1日進める、をくり返す。</p>
+      <dl>
+        <dt>スタート位置</dt><dd>光っている巣穴の前（Aで調べられる位置）</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+        <dt>止め方</dt><dd>1秒長押し</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="b2">
+      <div class="mode-head"><span class="blink c-blue" aria-label="青2回"><i></i><i></i></span><h3>IDくじ</h3></div>
+      <p class="what">日付を1日進める → ロトミでIDくじを引く、をくり返す。</p>
+      <dl>
+        <dt>スタート位置</dt><dd>ポケモンセンターのロトミ（パソコン）の前</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+        <dt>止め方</dt><dd>1秒長押し</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="b3">
+      <div class="mode-head"><span class="blink c-blue" aria-label="青3回"><i></i><i></i><i></i></span><h3>年数変更（巣穴を進める）</h3></div>
+      <p class="what">「みんなで挑戦」で募集を始める → ホームで年を1つ進める → 募集をやめる、をくり返す。巣穴のポケモンを進めるのに使う。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>本体の年を2000年など若い年にしておく（2060年までしか進められない）</li>
+      </ul>
+      <dl>
+        <dt>スタート位置</dt><dd>巣穴の前で「みんなで挑戦」にカーソルを合わせた状態</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>進める年数の10の位</li>
+            <li>進める年数の1の位</li>
+          </ol>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="b4">
+      <div class="mode-head"><span class="blink c-blue" aria-label="青4回"><i></i><i></i><i></i><i></i></span><h3>ポケジョブ</h3></div>
+      <p class="what">いちばん上の依頼にボックスのポケモンを全部送り出す → 日付を1日進める → 受け取る、をくり返す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>送り出したいポケモンを、ボックスを開いたとき最初に出るボックスに入れておく</li>
+      </ul>
+      <dl>
+        <dt>スタート位置</dt><dd>ポケモンセンターのロトミ（パソコン）の前</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+        <dt>止め方</dt><dd>1秒長押し</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="r1">
+      <div class="mode-head"><span class="blink c-red" aria-label="赤1回"><i></i></span><h3>レイド周回</h3></div>
+      <p class="what">Aを押し続けて、願いの塊 → レイドバトル → 捕獲を進める（かんたん版。ダイマックスは使わない）。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>手持ちの先頭にレイドで使うポケモン（技は1つだけ）</li>
+        <li>願いの塊を持っておく。インターネットは切っておく</li>
+        <li>捕まえたくないならボールを持たない</li>
+      </ul>
+      <dl>
+        <dt>スタート位置</dt><dd>巣穴の前</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="r2">
+      <div class="mode-head"><span class="blink c-red" aria-label="赤2回"><i></i><i></i></span><h3>バトルタワー</h3></div>
+      <p class="what">シングルバトルをずっと周回する。負けても勝ち抜いても、自動でまた参加する。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>VS → バトルスタジアム → レンタルチームで、ID <b>0000-0006-15Y4-3R</b>（ザシアン／ムゲンダイナ／ウオノラゴン）を借りる</li>
+        <li>バトルタワーのシングルバトルに、このチームでザシアンを先頭にして参加する</li>
+      </ul>
+      <dl>
+        <dt>スタート位置</dt><dd>1戦目で「たたかう」を押せる画面</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="r3">
+      <div class="mode-head"><span class="blink c-red" aria-label="赤3回"><i></i><i></i><i></i></span><h3>トーナメント</h3></div>
+      <p class="what">シュートスタジアムのトーナメントを周回し、終わったらボールガイからごほうびをもらってまた参加する。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>手持ちはレベル100のザシアン1匹だけ（技はアイアンヘッドだけ）がおすすめ</li>
+        <li>冠の雪原の「ガラルスタートーナメント」を始めていると動かない</li>
+      </ul>
+      <dl>
+        <dt>スタート位置</dt><dd>シュートスタジアムの受付の前</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="p1">
+      <div class="mode-head"><span class="blink c-purple" aria-label="紫1回"><i></i></span><h3>Switch 1 ／ Switch 2 の切り替え</h3></div>
+      <p class="what">1秒長押しするたびに Switch 2 ⇔ Switch 1 が切り替わる。設定は保存される。</p>
+      <dl>
+        <dt>今の設定</dt><dd>白の点滅で分かる（1回＝Switch 1、2回＝Switch 2）。挿した直後にも出る</dd>
+        <dt>変わること</dt><dd>青の機能の日付の変え方だけ。Switch 1 は初代・有機EL・Lite 共通</dd>
+      </dl>
+      <p class="note">Switch 1 で日付を変えるときは、ホームにソフトが4本以上並んでいる必要がある。</p>
+    </article>
+
+    <article class="mode" id="p2">
+      <div class="mode-head"><span class="blink c-purple" aria-label="紫2回"><i></i><i></i></span><h3>日付を1日進めるテスト</h3></div>
+      <p class="what">ホームの設定で日付を1日進めて、ゲームに戻って止まる。青の機能を使う前に、ちゃんと日付が変わるか確かめる用。</p>
+      <dl>
+        <dt>スタート位置</dt><dd>ゲーム画面</dd>
+      </dl>
+    </article>
+
+    <article class="mode" id="p3">
+      <div class="mode-head"><span class="blink c-purple" aria-label="紫3回"><i></i><i></i><i></i></span><h3>年を1つ進めるテスト</h3></div>
+      <p class="what">同じ流れで年を1つ進めて止まる。年数変更を使う前の確認用。</p>
+      <dl>
+        <dt>スタート位置</dt><dd>ゲーム画面</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section aria-labelledby="cycle">
+    <h2 id="cycle">卵のサイクル数</h2>
+    <p>孵すポケモンのサイクル数（攻略サイトの図鑑に載っている）に合わせて押す。</p>
     <div class="table-scroll">
       <table>
         <thead><tr><th>押す回数</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7以上</th></tr></thead>
@@ -288,216 +546,24 @@ footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction:
     </div>
   </section>
 
-
-  <section aria-labelledby="h-modes">
-    <h2 id="h-modes">機能ごとの説明</h2>
-
-    <article class="mode" id="w1">
-      <div class="mode-head"><span class="led c-white"><i></i><b>1</b></span><h3>A連打</h3></div>
-      <dl>
-        <dt>動き</dt><dd>Aボタンを押し続ける。会話送りや、穴掘り兄弟などに使う。</dd>
-        <dt>開始</dt><dd>どこでも</dd>
-        <dt>入力</dt><dd>なし</dd>
-      </dl>
-    </article>
-
-    <article class="mode" id="y1">
-      <div class="mode-head"><span class="led c-amber"><i></i><b>1</b></span><h3>卵受取・回数指定</h3></div>
-      <dl>
-        <dt>動き</dt><dd>5番道路の預かり屋で、自転車で走っては卵をもらう、をくり返す。卵はボックスに送られる。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>5番道路の預かり屋に親を2匹預ける。</li>
-            <li>手持ちは6匹（卵は入れない）。</li>
-            <li>空きボックスを用意し、ボックスを閉じるときは最初の空きボックスに合わせておく。</li>
-            <li>メニューのカーソルを「タウンマップ」に合わせて閉じる。</li>
-          </ul>
-        </dd>
-        <dt>開始</dt><dd>5番道路で自転車に乗った状態</dd>
-        <dt>入力</dt><dd>水色2回：ボックス数（10の位 → 1の位）。1ボックス＝30回受け取りを試す。</dd>
-      </dl>
-    </article>
-
-    <article class="mode" id="y2">
-      <div class="mode-head"><span class="led c-amber"><i></i><b>2</b></span><h3>卵孵化・回数指定</h3></div>
-      <dl>
-        <dt>動き</dt><dd>ボックスの卵を左の列から5個ずつ手持ちに入れ、預かり屋の近くの橋で回って孵す。孵ったポケモンは元の列に戻す。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>手持ちは とくせい「ほのおのからだ」などのポケモン<strong>1匹だけ</strong>。</li>
-            <li>卵で埋まったボックスを並べ、最初の卵のボックスを開いた状態で閉じておく。</li>
-            <li>同じ歩数の卵だけにする（歩数が違う卵が混ざると失敗する）。</li>
-            <li>メニューのカーソルを「ポケモン」に合わせて閉じる。</li>
-          </ul>
-        </dd>
-        <dt>開始</dt><dd>5番道路で自転車に乗った状態</dd>
-        <dt>入力</dt><dd>水色3回：サイクル数 → ボックス数の10の位 → 1の位</dd>
-      </dl>
-    </article>
-
-    <article class="mode" id="y3">
-      <div class="mode-head"><span class="led c-amber"><i></i><b>3</b></span><h3>卵受取＆孵化・回数指定</h3></div>
-      <dl>
-        <dt>動き</dt><dd>卵を1個ずつもらっては回り、5個そろったら孵るまで回る。孵った5匹はボックスの空き列に預ける。指定したボックス数が埋まったら止まる。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>ワイルドエリア「ハシノマはらっぱ」の預かり屋に親を2匹預ける。</li>
-            <li>手持ちは とくせい「ほのおのからだ」などのポケモン<strong>1匹だけ</strong>。</li>
-            <li>孵すポケモンは図鑑に登録済みにしておく。</li>
-            <li>空きボックスを隣り合わせに並べ、ボックスのカーソルを最初の空きボックスの左上に合わせておく。</li>
-            <li>メニューのカーソルを「タウンマップ」に合わせて閉じる。</li>
-          </ul>
-        </dd>
-        <dt>開始</dt><dd>ハシノマはらっぱの預かり屋の近くで自転車に乗った状態</dd>
-        <dt>入力</dt><dd>水色3回：サイクル数 → ボックス数の10の位 → 1の位</dd>
-      </dl>
-    </article>
-
-    <article class="mode" id="y4">
-      <div class="mode-head"><span class="led c-amber"><i></i><b>4</b></span><h3>ぐるぐる孵化</h3></div>
-      <dl>
-        <dt>動き</dt><dd>その場で円を描いて走り続け、孵化の会話をBで送る。</dd>
-        <dt>準備</dt><dd>手持ちの1番目に とくせい「ほのおのからだ」などのポケモン、2〜6番目に卵。</dd>
-        <dt>開始</dt><dd>自転車に乗って、ワイルドエリアなどの広い場所</dd>
-        <dt>入力</dt><dd>なし。全部孵ったら1秒長押しで止める。</dd>
-      </dl>
-    </article>
-
-    <article class="mode" id="g1">
-      <div class="mode-head"><span class="led c-green"><i></i><b>1</b></span><h3>ボックス逃がし・回数指定</h3></div>
-      <dl>
-        <dt>動き</dt><dd>ボックスのポケモンを左上から順に逃がす。指定したボックス数を逃がしたら止まる。</dd>
-        <dt>準備</dt><dd>逃がすボックスは30匹すべて埋めておく（空きやタマゴがあるとずれる）。</dd>
-        <dt>開始</dt><dd>ボックス画面で、カーソル（赤）を左上に合わせた状態</dd>
-        <dt>入力</dt><dd>水色2回：ボックス数（10の位 → 1の位）</dd>
-      </dl>
-    </article>
-
-    <article class="mode" id="g2">
-      <div class="mode-head"><span class="led c-green"><i></i><b>2</b></span><h3>カセキ復元</h3></div>
-      <dl>
-        <dt>動き</dt><dd>研究者に話しかけてカセキを復元し、ボックスに送る、をくり返す。</dd>
-        <dt>準備</dt><dd>バッグにカセキを4種類そろえる。手持ち/ボックスは「自動で送る」。</dd>
-        <dt>開始</dt><dd>6番道路の研究者（ウカッツ）の前</dd>
-        <dt>入力</dt><dd>
-          水色5回
-          <ul>
-            <li>1回目：0回＝トリ ／ 1回以上＝サカナ</li>
-            <li>2回目：0回＝リュウ ／ 1回以上＝クビナガ</li>
-            <li>3〜5回目：復元する回数の100の位 → 10の位 → 1の位（すべて0回なら1回）</li>
-          </ul>
-        </dd>
-      </dl>
-    </article>
-
-    <article class="mode" id="b1">
-      <div class="mode-head"><span class="led c-blue"><i></i><b>1</b></span><h3>ワット稼ぎ</h3></div>
-      <dl>
-        <dt>動き</dt><dd>巣穴を調べてワットをもらう → 日付を1日進める、をくり返す。</dd>
-        <dt>開始</dt><dd>巣穴の前（Aで調べられる位置）</dd>
-        <dt>入力</dt><dd>なし。1秒長押しで止める。</dd>
-      </dl>
-    </article>
-
-    <article class="mode" id="b2">
-      <div class="mode-head"><span class="led c-blue"><i></i><b>2</b></span><h3>IDくじ回収</h3></div>
-      <dl>
-        <dt>動き</dt><dd>日付を1日進める → ロトミでIDくじを引く、をくり返す。</dd>
-        <dt>開始</dt><dd>ポケモンセンターのロトミ（パソコン）の前</dd>
-        <dt>入力</dt><dd>なし。1秒長押しで止める。</dd>
-      </dl>
-    </article>
-
-    <article class="mode" id="b3">
-      <div class="mode-head"><span class="led c-blue"><i></i><b>3</b></span><h3>年数変更・回数指定</h3></div>
-      <dl>
-        <dt>動き</dt><dd>「みんなで挑戦」で募集を始める → ホームで年を1つ進める → 募集をやめる、をくり返す。巣穴を進めるのに使う。</dd>
-        <dt>準備</dt><dd>本体の年は2000年など若い年にしておく（2060年が上限）。</dd>
-        <dt>開始</dt><dd>巣穴の前で「みんなで挑戦」にカーソルを合わせた状態</dd>
-        <dt>入力</dt><dd>水色2回：進める年数（10の位 → 1の位）</dd>
-      </dl>
-    </article>
-
-    <article class="mode" id="b4">
-      <div class="mode-head"><span class="led c-blue"><i></i><b>4</b></span><h3>ポケジョブ</h3></div>
-      <dl>
-        <dt>動き</dt><dd>いちばん上の依頼に、ボックスのポケモンを全部選んで送り出す → 日付を1日進める → 受け取る、をくり返す。</dd>
-        <dt>準備</dt><dd>送り出したいポケモンを、ボックスを開いたときに最初に出るボックスに入れておく。</dd>
-        <dt>開始</dt><dd>ポケモンセンターのロトミ（パソコン）の前</dd>
-        <dt>入力</dt><dd>なし。1秒長押しで止める。</dd>
-      </dl>
-    </article>
-
-    <article class="mode" id="r1">
-      <div class="mode-head"><span class="led c-red"><i></i><b>1</b></span><h3>レイド周回</h3></div>
-      <dl>
-        <dt>動き</dt><dd>Aを押し続けて、巣穴への願いの塊・レイドバトル・捕獲を進める（簡易版）。ダイマックスは使わない。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>手持ちの先頭はレイドで使うポケモン（技は1つだけ）。</li>
-            <li>願いの塊を持っておく。インターネットは切断。</li>
-            <li>捕獲したくない場合はボールを持たない。</li>
-          </ul>
-        </dd>
-        <dt>開始</dt><dd>巣穴の前</dd>
-        <dt>入力</dt><dd>なし</dd>
-      </dl>
-    </article>
-
-    <article class="mode" id="r2">
-      <div class="mode-head"><span class="led c-red"><i></i><b>2</b></span><h3>バトルタワー</h3></div>
-      <dl>
-        <dt>動き</dt><dd>シングルバトルを永久に周回する。負けたときや勝ち抜いたときも、自動でもう一度参加する。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>VS → バトルスタジアム → レンタルチームで、ID <code>0000-0006-15Y4-3R</code>（ザシアン／ムゲンダイナ／ウオノラゴン）を借りる。</li>
-            <li>バトルタワーのシングルバトルに、このチームでザシアンを先頭にして参加する。</li>
-          </ul>
-        </dd>
-        <dt>開始</dt><dd>1戦目で「たたかう」を押せる画面</dd>
-        <dt>入力</dt><dd>なし</dd>
-      </dl>
-    </article>
-
-    <article class="mode" id="r3">
-      <div class="mode-head"><span class="led c-red"><i></i><b>3</b></span><h3>トーナメント</h3></div>
-      <dl>
-        <dt>動き</dt><dd>シュートスタジアムのトーナメントを周回し、終わったらボールガイからごほうびを受け取って再参加する。</dd>
-        <dt>準備</dt><dd>手持ちはレベル100のザシアン1匹だけ（技はアイアンヘッドだけ）がおすすめ。</dd>
-        <dt>開始</dt><dd>シュートスタジアムの受付の前</dd>
-        <dt>入力</dt><dd>なし</dd>
-      </dl>
-      <p class="callout">冠の雪原の「ガラルスタートーナメント」を始めていると動かない。</p>
-    </article>
-
-    <article class="mode" id="p1">
-      <div class="mode-head"><span class="led c-purple"><i></i><b>1</b></span><h3>本体切替</h3></div>
-      <dl>
-        <dt>動き</dt><dd>1秒長押しするたびに Switch 2 ⇔ Switch 1 が切り替わり、白の点滅で知らせる（1回＝Switch 1、2回＝Switch 2）。設定は保存される。</dd>
-        <dt>違い</dt><dd>日付変更（青の機能とテスト）の手順だけが変わる。Switch 1 は初代・有機EL・Lite 共通。</dd>
-      </dl>
-      <p class="note">Switch 1 の日付変更は、ホームにソフトが4本以上並んでいる前提。</p>
-    </article>
-
-    <article class="mode" id="p2">
-      <div class="mode-head"><span class="led c-purple"><i></i><b>2</b></span><h3>日付+1 テスト</h3></div>
-      <dl>
-        <dt>動き</dt><dd>ゲーム中からホームの設定で日付を1日進め、ゲームに戻って止まる。日付変更の手順がずれていないかの確認用。</dd>
-        <dt>開始</dt><dd>ゲーム画面</dd>
-      </dl>
-    </article>
-
-    <article class="mode" id="p3">
-      <div class="mode-head"><span class="led c-purple"><i></i><b>3</b></span><h3>年+1 テスト</h3></div>
-      <dl>
-        <dt>動き</dt><dd>日付+1 テストと同じ流れで、年を1つ進めて止まる。年数変更の確認用。</dd>
-        <dt>開始</dt><dd>ゲーム画面</dd>
-      </dl>
-    </article>
-    <a class="top-link" href="#top">早見表に戻る</a>
+  <section aria-labelledby="h-led">
+    <h2 id="h-led">LEDの光り方</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>光り方</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>青で光りっぱなし</td><td>挿した直後。登録中</td></tr>
+          <tr><td>白で1回か2回点滅</td><td>登録の直後。本体の設定（1回＝Switch 1、2回＝Switch 2）</td></tr>
+          <tr><td>機能の色で点滅をくり返す</td><td>止まっている。点滅の回数と色で今の機能が分かる</td></tr>
+          <tr><td>機能の色で光りっぱなし</td><td>動いている</td></tr>
+          <tr><td>水色</td><td>数を聞いている（4秒間）</td></tr>
+          <tr><td>白く一瞬光る</td><td>押した1回を数えた</td></tr>
+          <tr><td>3回速く光る</td><td>剣盾 ⇔ 設定 を切り替えた（剣盾＝赤、設定＝紫）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <a class="top-link" href="#top">上に戻る</a>
   </section>
-
-
 </div>
 </body>
 </html>
