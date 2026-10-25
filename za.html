@@ -166,6 +166,28 @@ footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction:
 @media (prefers-reduced-motion: no-preference) {
   .rows a { transition: background 0.15s; }
 }
+/* v2: 点滅の回数を点の数で見せる（点の数＝1周の点滅回数） */
+.blink { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; min-width: 0; vertical-align: -2px; }
+.blink i {
+  width: 12px; height: 12px; border-radius: 50%; background: var(--c);
+  box-shadow: 0 0 0 1px var(--line), 0 0 6px color-mix(in srgb, var(--c) 70%, transparent);
+}
+.rows a { grid-template-columns: 84px 1fr; }
+.mode-head .blink i { width: 14px; height: 14px; }
+.mode .what { font-size: 1rem; }
+.mode h4 { margin: 0; font-size: 0.92rem; color: var(--muted); font-weight: 700; }
+.mode dl { grid-template-columns: 6.5em 1fr; }
+ul.check { list-style: none; padding-left: 0; }
+ul.check li { position: relative; padding-left: 1.5em; }
+ul.check li::before {
+  content: ""; position: absolute; left: 0.1em; top: 0.45em; width: 0.8em; height: 0.8em;
+  border: 1.5px solid var(--accent); border-radius: 3px;
+}
+ol.q { padding-left: 1.6em; }
+ol.q li::marker { color: var(--accent); font-weight: 700; }
+.ex { display: block; margin-top: 6px; font-size: 0.88rem; color: var(--muted); background: var(--code-bg); border-radius: 6px; padding: 6px 10px; }
+.callout { line-height: 1.9; }
+@media (max-width: 420px) { .rows a { grid-template-columns: 70px 1fr; } }
 </style>
 </head>
 <body>
@@ -175,87 +197,72 @@ footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction:
     <h1>レジェンズZA多機能マクロ Switch・Switch 2</h1>
   </header>
 
-  <section aria-labelledby="h-settings">
-    <h2 id="h-settings">先にやっておく設定</h2>
-    <ul>
-      <li>オプション：話のはやさ はやい</li>
-      <li>マップ：右スティック下で一番小さく（広く）しておく</li>
-      <li>ほかのコントローラー（プロコンなど）は切っておく</li>
-      <li>本体の種類：Switch 1（Lite含む）で使うときは、<a href="#p1">紫1の「本体切替」</a>で切り替える。最初は Switch 2（Switch 2 Edition 向けのロード時間）</li>
-    </ul>
-  </section>
-
-  <section aria-labelledby="h-basic">
-    <h2 id="h-basic">使い方</h2>
-    <p class="note">押すのは基板の「BOOT」と書かれたボタン。「RESET」は押さない。</p>
-    <ol class="steps">
-      <li><strong>ゲーム側の準備をする</strong><span>下の「機能ごとの説明」にある開始位置にしておく。ここまではいつものコントローラーで操作してOK。</span></li>
-      <li><strong>ボードをSwitchに挿す</strong><span>「コントローラー」→「持ちかた/順番を変える」を開いてから、ドックのUSB端子に挿す。LEDがライム色に光り、自動で登録される。続けて白の点滅で本体の設定を知らせる（1回＝Switch 1、2回＝Switch 2）。点滅に変わったら完了。画面を閉じてゲームに戻る。</span></li>
-      <li><strong>ちょん押しで機能を選ぶ</strong><span>押すたびに次の機能に変わる。LEDの色と点滅の回数を、下の早見表で確認する。</span></li>
-      <li><strong>1秒長押しでスタート</strong><span>LEDが機能の色で光りっぱなしになったら動作中。回数を入れる機能は、先に水色の間に回数を入れる（下の「回数の入れ方」）。</span></li>
-      <li><strong>止めるときも1秒長押し</strong><span>色違いが出たら長押しで止めて、手で捕まえる。</span></li>
-    </ol>
-    <h3>LEDの見方</h3>
-    <div class="table-scroll">
-      <table>
-        <thead><tr><th>光り方</th><th>状態</th></tr></thead>
-        <tbody>
-          <tr><td><span class="led c-lime"><i></i></span> ライム色で光りっぱなし</td><td>挿した直後。登録中</td></tr>
-          <tr><td><span class="led c-white"><i></i></span> 白で1回か2回点滅</td><td>登録の直後。本体の設定（1回＝Switch 1、2回＝Switch 2）</td></tr>
-          <tr><td>機能の色で点滅</td><td>待機中。点滅の回数と色で、選んでいる機能を表す</td></tr>
-          <tr><td>機能の色で光りっぱなし</td><td>動作中</td></tr>
-          <tr><td><span class="led c-cyan"><i></i></span> 水色</td><td>回数の入力待ち</td></tr>
-          <tr><td><span class="led c-white"><i></i></span> 白く一瞬光る</td><td>入力の1回を受け付けた</td></tr>
-        </tbody>
-      </table>
+  <section aria-labelledby="h-btn">
+    <h2 id="h-btn">ボタンは1つだけ</h2>
+    <p>ボードの「<b>BOOT</b>」と書かれたボタンを使います（「RESET」は押さない）。押し方は2つだけです。</p>
+    <div class="ops">
+      <div class="op"><span class="what">ちょん押し</span><span class="how">次の機能に変える</span></div>
+      <div class="op"><span class="what">1秒長押し</span><span class="how">スタート ／ ストップ</span></div>
     </div>
   </section>
 
+  <section aria-labelledby="h-flow">
+    <h2 id="h-flow">使う流れ</h2>
+    <ol class="steps">
+      <li><strong>ゲームの中で準備する</strong><span>下の機能の説明にある「スタート前にやること」とスタート位置を、いつものコントローラーでやっておく。</span></li>
+      <li><strong>ボードをSwitchに挿す</strong><span>先に「コントローラー」→「持ちかた/順番を変える」を開いてから、ドックのUSBに挿す。LEDが<b>ライム色</b>に光って自動で登録される。続けて白の点滅で本体の設定を教えてくれる（1回＝Switch 1、2回＝Switch 2）。機能の色の点滅に変わったら完了。画面を閉じてゲームに戻る。</span></li>
+      <li><strong>ちょん押しで機能を選ぶ</strong><span>LEDが「色」と「点滅の回数」で今の機能を教えてくれる。下の一覧と見比べて、使いたい機能になるまでちょん押しする。</span></li>
+      <li><strong>1秒長押しでスタート</strong><span>数を聞く機能は、LEDが<b>水色</b>になる。下の「回数の入れ方」のとおりに押す。LEDが機能の色で光りっぱなしになったら動いている。</span></li>
+      <li><strong>止めるときも1秒長押し</strong><span>色違いが出たら、1秒長押しで止めて手で捕まえる。</span></li>
+    </ol>
+  </section>
+
   <section aria-labelledby="h-index">
-    <h2 id="h-index">LED早見表</h2>
+    <h2 id="h-index">機能の一覧</h2>
+    <p>止まっているあいだ、LEDは機能の色で<b>点の数だけ</b>点滅をくり返します。たとえば <span class="blink c-pink" aria-hidden="true"><i></i><i></i><i></i></span> は「ピンクが3回ずつ点滅」＝ ワイルドゾーン（そらをとぶ）。</p>
     <div class="index">
       <div class="group">
         <div class="group-name">共通</div>
         <div class="rows">
-          <a href="#w1"><span class="led c-white"><i></i><b>1</b></span><span class="name">A連打</span></a>
+          <a href="#w1"><span class="blink c-white" aria-label="白1回"><i></i></span><span class="name">A連打</span></a>
         </div>
       </div>
       <div class="group">
-        <div class="group-name">色違い厳選</div>
+        <div class="group-name">色違い厳選（LEDはピンク）</div>
         <div class="rows">
-          <a href="#s1"><span class="led c-pink"><i></i><b>1</b></span><span class="name">ベンチ色厳選</span></a>
-          <a href="#s2"><span class="led c-pink"><i></i><b>2</b></span><span class="name">ベンチ＋往復（ワイルドゾーン20）</span></a>
-          <a href="#s3"><span class="led c-pink"><i></i><b>3</b></span><span class="name">ワイルドゾーン（そらをとぶ）</span></a>
-          <a href="#s4"><span class="led c-pink"><i></i><b>4</b></span><span class="name">ワイルドゾーン出入り</span></a>
-          <a href="#s5"><span class="led c-pink"><i></i><b>5</b></span><span class="name">異次元ゾーン</span></a>
-          <a href="#s6"><span class="led c-pink"><i></i><b>6</b></span><span class="name">建物出入り</span></a>
+          <a href="#s1"><span class="blink c-pink" aria-label="ピンク1回"><i></i></span><span class="name">ベンチ色厳選</span></a>
+          <a href="#s2"><span class="blink c-pink" aria-label="ピンク2回"><i></i><i></i></span><span class="name">ベンチ＋往復（ワイルドゾーン20）</span></a>
+          <a href="#s3"><span class="blink c-pink" aria-label="ピンク3回"><i></i><i></i><i></i></span><span class="name">ワイルドゾーン（そらをとぶ）</span></a>
+          <a href="#s4"><span class="blink c-pink" aria-label="ピンク4回"><i></i><i></i><i></i><i></i></span><span class="name">ワイルドゾーン出入り</span></a>
+          <a href="#s5"><span class="blink c-pink" aria-label="ピンク5回"><i></i><i></i><i></i><i></i><i></i></span><span class="name">異次元ゾーン</span></a>
+          <a href="#s6"><span class="blink c-pink" aria-label="ピンク6回"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="name">建物出入り</span></a>
         </div>
       </div>
       <div class="group">
-        <div class="group-name">ドーナツ</div>
+        <div class="group-name">ドーナツ（LEDは黄）</div>
         <div class="rows">
-          <a href="#y1"><span class="led c-amber"><i></i><b>1</b></span><span class="name">ドーナツリセット</span></a>
-          <a href="#y2"><span class="led c-amber"><i></i><b>2</b></span><span class="name">同じドーナツを作る</span></a>
+          <a href="#y1"><span class="blink c-amber" aria-label="黄1回"><i></i></span><span class="name">ドーナツリセット</span></a>
+          <a href="#y2"><span class="blink c-amber" aria-label="黄2回"><i></i><i></i></span><span class="name">同じドーナツを作る</span></a>
         </div>
       </div>
       <div class="group">
-        <div class="group-name">ショップ</div>
+        <div class="group-name">ショップ（LEDは緑）</div>
         <div class="rows">
-          <a href="#g1"><span class="led c-green"><i></i><b>1</b></span><span class="name">ショップ自動購入</span></a>
+          <a href="#g1"><span class="blink c-green" aria-label="緑1回"><i></i></span><span class="name">ショップ自動購入</span></a>
         </div>
       </div>
       <div class="group">
-        <div class="group-name">周回</div>
+        <div class="group-name">周回（LEDは赤）</div>
         <div class="rows">
-          <a href="#r1"><span class="led c-red"><i></i><b>1</b></span><span class="name">レストラン周回</span></a>
-          <a href="#r2"><span class="led c-red"><i></i><b>2</b></span><span class="name">ユカリトーナメント周回</span></a>
+          <a href="#r1"><span class="blink c-red" aria-label="赤1回"><i></i></span><span class="name">レストラン周回</span></a>
+          <a href="#r2"><span class="blink c-red" aria-label="赤2回"><i></i><i></i></span><span class="name">ユカリトーナメント周回</span></a>
         </div>
       </div>
       <div class="group">
-        <div class="group-name">設定</div>
+        <div class="group-name">設定（同じ一覧に入っている。LEDは紫）</div>
         <div class="rows">
-          <a href="#p1"><span class="led c-purple"><i></i><b>1</b></span><span class="name">本体切替（Switch 2 ⇔ Switch 1）</span></a>
-          <a href="#p2"><span class="led c-purple"><i></i><b>2</b></span><span class="name">ロード時間調整</span></a>
+          <a href="#p1"><span class="blink c-purple" aria-label="紫1回"><i></i></span><span class="name">Switch 1 ／ Switch 2 の切り替え</span></a>
+          <a href="#p2"><span class="blink c-purple" aria-label="紫2回"><i></i><i></i></span><span class="name">ロード時間調整</span></a>
         </div>
       </div>
     </div>
@@ -263,13 +270,27 @@ footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction:
 
   <section aria-labelledby="h-input">
     <h2 id="h-input">回数の入れ方</h2>
-    <p>水色に光っている4秒間に押した回数が数字になる。</p>
-    <div class="window-demo" aria-label="入力の例">
-      <span class="led c-cyan"><i></i></span><span class="slot">1回目 = 10の位</span><span class="arrow">→</span>
-      <span class="led c-cyan"><i></i></span><span class="slot">2回目 = 1の位</span>
-    </div>
+    <p>スタートすると、機能によってはLEDが<b>水色</b>になって数を聞いてきます。</p>
     <ul>
-      <li>12 → 1回目に1回、2回目に2回。ゾーン番号は何も押さなければ 1。</li>
+      <li>水色のあいだ（4秒）に押した回数が、その数になる。押すたびに白く光る。</li>
+      <li>何も押さなければ <b>0</b>。ゾーン番号だけは、どちらも押さなければ <b>1</b> になる。</li>
+      <li>水色が一度消えて、また水色になったら次の質問。</li>
+    </ul>
+    <div class="callout">
+      <b>例：「ゾーン番号」を 14 にしたいとき</b>（質問が2回くる）<br>
+      1回目の水色 → <b>1回</b>押す（10の位）<br>
+      2回目の水色 → <b>4回</b>押す（1の位）<br>
+      ゾーン5なら、1回目は押さずに待って、2回目に5回押す。
+    </div>
+  </section>
+
+  <section aria-labelledby="h-settings">
+    <h2 id="h-settings">最初に1回だけやっておくこと</h2>
+    <ul class="check">
+      <li>ゲームのオプション：話のはやさ「はやい」</li>
+      <li>マップ：右スティック下で一番小さく（広く）しておく</li>
+      <li>ほかのコントローラー（プロコンなど）は切っておく</li>
+      <li>Switch 1・Lite で使うなら：<a href="#p1">Switch 1 ／ Switch 2 の切り替え</a>で Switch 1 にする（最初は Switch 2。Switch 2 Edition 向けのロード時間）</li>
     </ul>
   </section>
 
@@ -277,147 +298,234 @@ footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction:
     <h2 id="h-modes">機能ごとの説明</h2>
 
     <article class="mode" id="w1">
-      <div class="mode-head"><span class="led c-white"><i></i><b>1</b></span><h3>A連打</h3></div>
+      <div class="mode-head"><span class="blink c-white" aria-label="白1回"><i></i></span><h3>A連打</h3></div>
+      <p class="what">Aボタンを押し続ける。</p>
       <dl>
-        <dt>動き</dt><dd>Aボタンを押し続ける。</dd>
-        <dt>開始</dt><dd>どこでも</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>どこでも</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
       </dl>
     </article>
 
     <article class="mode" id="s1">
-      <div class="mode-head"><span class="led c-pink"><i></i><b>1</b></span><h3>ベンチ色厳選</h3></div>
+      <div class="mode-head"><span class="blink c-pink" aria-label="ピンク1回"><i></i></span><h3>ベンチ色厳選</h3></div>
+      <p class="what">スティック下を倒したままA連打で、ベンチに座って昼夜を切り替え続ける。切り替えるたびに周りのポケモンが湧き直す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>一度ベンチに座って昼夜を切り替える</li>
+        <li>立ち上がったら、<b>ベンチを背にして立ったまま</b>にする</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>スティック下を倒したままA連打で、ベンチに座って昼夜を切り替え続ける。切り替えるたびに周りのポケモンが湧き直す。</dd>
-        <dt>準備</dt><dd>一度ベンチに座って昼夜を切り替え、<strong>ベンチを背にして立ち上がったまま</strong>にする。</dd>
-        <dt>開始</dt><dd>上の状態</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>ベンチを背にして立った状態</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+        <dt>止め方</dt><dd>色違いが出たら1秒長押し</dd>
       </dl>
     </article>
 
     <article class="mode" id="s2">
-      <div class="mode-head"><span class="led c-pink"><i></i><b>2</b></span><h3>ベンチ＋往復（ワイルドゾーン20）</h3></div>
+      <div class="mode-head"><span class="blink c-pink" aria-label="ピンク2回"><i></i><i></i></span><h3>ベンチ＋往復（ワイルドゾーン20）</h3></div>
+      <p class="what">ベンチで休む → ゾーンの奥まで走って戻る、をくり返す。ベンチからは届かない中央のオヤブン2匹なども厳選できる。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>できれば緑のカナリィぬい（主人公の耐久力）を持っておく</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>ベンチで休む → ゾーンの奥まで走って戻る、をくり返す。ベンチからは届かない中央のオヤブン2匹なども厳選できる。</dd>
-        <dt>準備</dt><dd>できれば緑のカナリィぬい（主人公の耐久力）を持っておく。</dd>
-        <dt>開始</dt><dd>ワイルドゾーン20に「そらをとぶ」で来た南東から入ってすぐのベンチで、Aを押して「時間をつぶす」にカーソルが合った状態</dd>
-        <dt>入力</dt><dd>水色1回：片道を走る秒数（0回なら9秒。8〜9がおすすめ）</dd>
+        <dt>スタート位置</dt><dd>ワイルドゾーン20に「そらをとぶ」で来て、南東から入ってすぐのベンチ。Aを押して「時間をつぶす」にカーソルが合った状態</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>片道を走る秒数（押さなければ9秒。8〜9がおすすめ）</li>
+          </ol>
+          <span class="ex">例：片道8秒 → ①8回。9秒のままなら押さずに待つ</span>
+        </dd>
+        <dt>止め方</dt><dd>色違いが出たら1秒長押し</dd>
       </dl>
     </article>
 
     <article class="mode" id="s3">
-      <div class="mode-head"><span class="led c-pink"><i></i><b>3</b></span><h3>ワイルドゾーン（そらをとぶ）</h3></div>
+      <div class="mode-head"><span class="blink c-pink" aria-label="ピンク3回"><i></i><i></i><i></i></span><h3>ワイルドゾーン（そらをとぶ）</h3></div>
+      <p class="what">移動スポットの一覧から、決めたワイルドゾーンへ「そらをとぶ」、をくり返す。着いた場所の周りのポケモンが湧き直す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>マップを開いてY →「移動スポット」でマイナスを押し、一覧を「ゾーン」に絞り込む（ソフトを再起動すると戻るので、毎回やる）</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>移動スポットの一覧から指定したワイルドゾーンへ「そらをとぶ」、をくり返す。着いた場所の周りのポケモンが湧き直す。</dd>
-        <dt>準備</dt><dd>マップを開いてY →「移動スポット」でマイナスを押し、一覧を「ゾーン」に絞り込む（ソフトを再起動すると戻るので毎回やる）。</dd>
-        <dt>開始</dt><dd>野生ポケモンに狙われていないフィールド</dd>
-        <dt>入力</dt><dd>水色2回：ゾーン番号（10の位 → 1の位、1〜20）</dd>
+        <dt>スタート位置</dt><dd>野生ポケモンに狙われていないフィールド</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>ゾーン番号の10の位</li>
+            <li>ゾーン番号の1の位（ゾーンは1〜20）</li>
+          </ol>
+          <span class="ex">例：ゾーン14 → ①1回 ②4回</span>
+        </dd>
+        <dt>止め方</dt><dd>色違いが出たら1秒長押し</dd>
       </dl>
-      <p class="note">おすすめ：2（オヤブンコイキング・ヒトデマン）、4（ゴース・イトマルなど）、13（カイロス・オヤブンオーロット）、14（ココドラ・イワーク）、19（ガルーラ・トリミアン・イーブイ）。</p>
+      <p class="note">おすすめのゾーン：2（オヤブンコイキング・ヒトデマン）、4（ゴース・イトマルなど）、13（カイロス・オヤブンオーロット）、14（ココドラ・イワーク）、19（ガルーラ・トリミアン・イーブイ）。</p>
     </article>
 
     <article class="mode" id="s4">
-      <div class="mode-head"><span class="led c-pink"><i></i><b>4</b></span><h3>ワイルドゾーン出入り</h3></div>
+      <div class="mode-head"><span class="blink c-pink" aria-label="ピンク4回"><i></i><i></i><i></i><i></i></span><h3>ワイルドゾーン出入り</h3></div>
+      <p class="what">ワイルドゾーンに入る → マップからゾーンの入り口へファストトラベル、をくり返す。ワイルドゾーン5向け。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>ファストトラベルでゾーンの入り口に飛んでおく（Aを押せばそのまま入れる位置）</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>ワイルドゾーンに入る → マップからゾーンの入り口へファストトラベル、をくり返す。</dd>
-        <dt>準備</dt><dd>ファストトラベルでゾーンの入り口に飛んでおく（Aを押せばそのまま入れる位置）。</dd>
-        <dt>開始</dt><dd>ゾーンの入り口の前</dd>
-        <dt>入力</dt><dd>水色2回：ゾーン番号（10の位 → 1の位）。2と5はそのまま入り、それ以外は前転してから入る</dd>
+        <dt>スタート位置</dt><dd>ゾーンの入り口の前</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>ゾーン番号の10の位</li>
+            <li>ゾーン番号の1の位</li>
+          </ol>
+          <span class="ex">例：ゾーン5 → ①押さない ②5回</span>
+        </dd>
+        <dt>止め方</dt><dd>色違いが出たら1秒長押し</dd>
       </dl>
-      <p class="note">ワイルドゾーン5向け。入ってすぐ野生に見つかるゾーン（19など）では止まる。</p>
+      <p class="note">ゾーン2と5はそのまま入り、それ以外は前転してから入る。入ってすぐ野生に見つかるゾーン（19など）では止まる。</p>
     </article>
 
     <article class="mode" id="s5">
-      <div class="mode-head"><span class="led c-pink"><i></i><b>5</b></span><h3>異次元ゾーン</h3></div>
+      <div class="mode-head"><span class="blink c-pink" aria-label="ピンク5回"><i></i><i></i><i></i><i></i><i></i></span><h3>異次元ゾーン</h3></div>
+      <p class="what">マップを開いて、今いる場所にファストトラベル、をくり返す。</p>
       <dl>
-        <dt>動き</dt><dd>マップを開いて今いる場所にファストトラベル、をくり返す。</dd>
-        <dt>開始</dt><dd>異次元ゾーンに入ったあと</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>異次元ゾーンに入ったあと</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+        <dt>止め方</dt><dd>色違いが出たら1秒長押し</dd>
       </dl>
     </article>
 
     <article class="mode" id="s6">
-      <div class="mode-head"><span class="led c-pink"><i></i><b>6</b></span><h3>建物出入り</h3></div>
+      <div class="mode-head"><span class="blink c-pink" aria-label="ピンク6回"><i></i><i></i><i></i><i></i><i></i><i></i></span><h3>建物出入り</h3></div>
+      <p class="what">下に歩いて出る → Aで入る、をくり返す。扉や階段（ワイルドゾーン4など）で使う。</p>
       <dl>
-        <dt>動き</dt><dd>下に歩いて出る → Aで入る、をくり返す。扉や階段（ワイルドゾーン4など）で使う。</dd>
-        <dt>開始</dt><dd>扉か階段の方を向いて立った状態</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>扉か階段の方を向いて立った状態</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+        <dt>止め方</dt><dd>色違いが出たら1秒長押し</dd>
       </dl>
     </article>
 
     <article class="mode" id="y1">
-      <div class="mode-head"><span class="led c-amber"><i></i><b>1</b></span><h3>ドーナツリセット</h3></div>
+      <div class="mode-head"><span class="blink c-amber" aria-label="黄1回"><i></i></span><h3>ドーナツリセット</h3></div>
+      <p class="what">ゲームを終了 → バックアップから始め直す → ホテルZのドーナツ作りの前まで戻る。使ったきのみは戻る。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>ホテルZの東のポケモンセンターで、バックアップセーブを作っておく</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>ゲームを終了 → バックアップから始め直す → ホテルZのドーナツ作りの前まで戻る。1回動いて止まる。きのみは戻る。</dd>
-        <dt>準備</dt><dd>ホテルZの東のポケモンセンターでバックアップセーブを作っておく。</dd>
-        <dt>開始</dt><dd>ドーナツを作って、気に入らなかったとき（どの画面でもOK）</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>ドーナツを作って、気に入らなかったとき（どの画面でもOK）</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+        <dt>終わり</dt><dd>1回動いたら自動で止まる</dd>
       </dl>
-      <p class="note">ゲームを終了してバックアップから読み込むので、バックアップより後の進み具合は消える。</p>
+      <div class="callout"><b>注意：</b>ゲームを終了してバックアップから読み込むので、バックアップより後の進み具合は消える。</div>
     </article>
 
     <article class="mode" id="y2">
-      <div class="mode-head"><span class="led c-amber"><i></i><b>2</b></span><h3>同じドーナツを作る</h3></div>
+      <div class="mode-head"><span class="blink c-amber" aria-label="黄2回"><i></i><i></i></span><h3>同じドーナツを作る</h3></div>
+      <p class="what">「同じものを作る」で、同じドーナツを決めた個数だけ作る。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>作りたいドーナツを1回、手で作る</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>「同じものを作る」で、同じドーナツを指定した個数作る。</dd>
-        <dt>準備</dt><dd>作りたいドーナツを1回手で作る。</dd>
-        <dt>開始</dt><dd>ドーナツを作り終えた画面</dd>
-        <dt>入力</dt><dd>水色3回：個数の百の位 → 十の位 → 一の位</dd>
+        <dt>スタート位置</dt><dd>ドーナツを作り終えた画面</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>個数の100の位</li>
+            <li>個数の10の位</li>
+            <li>個数の1の位</li>
+          </ol>
+          <span class="ex">例：25個 → ①押さない ②2回 ③5回</span>
+        </dd>
       </dl>
     </article>
 
     <article class="mode" id="g1">
-      <div class="mode-head"><span class="led c-green"><i></i><b>1</b></span><h3>ショップ自動購入</h3></div>
+      <div class="mode-head"><span class="blink c-green" aria-label="緑1回"><i></i></span><h3>ショップ自動購入</h3></div>
+      <p class="what">きのみやハーブを1個ずつ買う、を決めた回数くり返す。</p>
       <dl>
-        <dt>動き</dt><dd>きのみやハーブを1個ずつ買う、を指定した回数くり返す。</dd>
-        <dt>開始</dt><dd>お店の「買う」の一覧の画面</dd>
-        <dt>入力</dt><dd>水色4回
-          <ul>
-            <li>1回目：買うものが一覧の上から何番目か（0回＝カーソルを動かさない。カーソルが毎回一番上に戻るお店は番号を入れる）</li>
-            <li>2〜4回目：買う回数の百の位 → 十の位 → 一の位</li>
-          </ul>
+        <dt>スタート位置</dt><dd>お店の「買う」の一覧の画面</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>買うものが一覧の上から何番目か（押さない＝カーソルを動かさない。カーソルが毎回一番上に戻るお店は番号を入れる）</li>
+            <li>買う回数の100の位</li>
+            <li>買う回数の10の位</li>
+            <li>買う回数の1の位</li>
+          </ol>
+          <span class="ex">例：上から3番目を50回 → ①3回 ②押さない ③5回 ④押さない</span>
         </dd>
       </dl>
     </article>
 
     <article class="mode" id="r1">
-      <div class="mode-head"><span class="led c-red"><i></i><b>1</b></span><h3>レストラン周回</h3></div>
+      <div class="mode-head"><span class="blink c-red" aria-label="赤1回"><i></i></span><h3>レストラン周回</h3></div>
+      <p class="what">ZLでロックオンしながらA連打で、レストラン・ド・フツーの戦闘をくり返す。バトル1000回のリサーチや金策に。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>Aボタンに先制技（しんそくなど）を割り当てたポケモンを出せるようにする</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>ZLでロックオンしながらA連打で、レストラン・ド・フツーの戦闘をくり返す（バトル1000回のリサーチ・金策）。</dd>
-        <dt>準備</dt><dd>Aボタンに先制技（しんそくなど）を割り当てたポケモンを出せるようにする。</dd>
-        <dt>開始</dt><dd>レストラン・ド・フツーの受付に話しかけた状態</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>レストラン・ド・フツーの受付に話しかけた状態</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
       </dl>
     </article>
 
     <article class="mode" id="r2">
-      <div class="mode-head"><span class="led c-red"><i></i><b>2</b></span><h3>ユカリトーナメント周回</h3></div>
+      <div class="mode-head"><span class="blink c-red" aria-label="赤2回"><i></i><i></i></span><h3>ユカリトーナメント周回</h3></div>
+      <p class="what">ZLでロックオンしながらA・X連打で、ユカリトーナメント∞をくり返す。DLCクリア後でも動く。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>戦うポケモンは3匹がおすすめ</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>ZLでロックオンしながらA・X連打で、ユカリトーナメント∞をくり返す。DLCクリア後でも動く。</dd>
-        <dt>準備</dt><dd>戦うポケモンは3匹がおすすめ。</dd>
-        <dt>開始</dt><dd>ユカリの前</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>ユカリの前</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
       </dl>
     </article>
 
     <article class="mode" id="p1">
-      <div class="mode-head"><span class="led c-purple"><i></i><b>1</b></span><h3>本体切替</h3></div>
+      <div class="mode-head"><span class="blink c-purple" aria-label="紫1回"><i></i></span><h3>Switch 1 ／ Switch 2 の切り替え</h3></div>
+      <p class="what">1秒長押しするたびに Switch 2 ⇔ Switch 1 が切り替わる。設定は保存される。</p>
       <dl>
-        <dt>動き</dt><dd>1秒長押しするたびに Switch 2 ⇔ Switch 1 が切り替わり、白の点滅で知らせる（1回＝Switch 1、2回＝Switch 2）。設定は保存される。</dd>
-        <dt>違い</dt><dd>ロードを待つ時間だけが変わる（Switch 1 は長め）。</dd>
+        <dt>今の設定</dt><dd>白の点滅で分かる（1回＝Switch 1、2回＝Switch 2）。切り替えたときと、挿した直後に出る</dd>
+        <dt>変わること</dt><dd>ロードを待つ時間だけ（Switch 1 は長め）。Switch 1 は Lite も含む</dd>
       </dl>
     </article>
 
     <article class="mode" id="p2">
-      <div class="mode-head"><span class="led c-purple"><i></i><b>2</b></span><h3>ロード時間調整</h3></div>
-      <p>ロードが終わる前に次の操作をしてしまうときは長くする。ワイルドゾーン・異次元ゾーン・ベンチ＋往復・ドーナツリセットの待ち時間すべてに足される。値は保存される。</p>
+      <div class="mode-head"><span class="blink c-purple" aria-label="紫2回"><i></i><i></i></span><h3>ロード時間調整</h3></div>
+      <p class="what">ロードを待つ時間を0.1秒ずつ長く・短くする。値は保存される。</p>
+      <h4>こんなときに使う</h4>
+      <ul class="check">
+        <li>ロードが終わる前に次の操作をしてしまうときは、長くする</li>
+        <li>ワイルドゾーン・異次元ゾーン・ベンチ＋往復・ドーナツリセットの待ち時間すべてに足される</li>
+      </ul>
       <dl>
-        <dt>入力</dt><dd>水色2回：長くする回数 → 短くする回数（1回＝0.1秒）。どちらも0回なら元に戻す。</dd>
-        <dt>結果</dt><dd>今の調整量を点滅で知らせる（白＝長くした0.1秒の数／黄＝短くした0.1秒の数／水色1回＝元のまま）</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>長くする回数（1回＝0.1秒）</li>
+            <li>短くする回数（1回＝0.1秒）</li>
+          </ol>
+          <span class="ex">例：0.5秒長くする → ①5回 ②押さない。押した分は、今までの調整に足される。どちらも押さなければ元に戻る</span>
+        </dd>
+        <dt>結果</dt><dd>今の調整量を点滅で教えてくれる。白＝長くした0.1秒の数、黄＝短くした0.1秒の数、水色1回＝元のまま</dd>
       </dl>
     </article>
+  </section>
 
-    <a class="top-link" href="#top">早見表に戻る</a>
+  <section aria-labelledby="h-led">
+    <h2 id="h-led">LEDの光り方</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>光り方</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>ライム色で光りっぱなし</td><td>挿した直後。登録中</td></tr>
+          <tr><td>白で1回か2回点滅</td><td>登録の直後。本体の設定（1回＝Switch 1、2回＝Switch 2）</td></tr>
+          <tr><td>機能の色で点滅をくり返す</td><td>止まっている。点滅の回数と色で今の機能が分かる</td></tr>
+          <tr><td>機能の色で光りっぱなし</td><td>動いている</td></tr>
+          <tr><td>水色</td><td>数を聞いている（4秒間）</td></tr>
+          <tr><td>白く一瞬光る</td><td>押した1回を数えた</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <a class="top-link" href="#top">上に戻る</a>
   </section>
 </div>
 </body>

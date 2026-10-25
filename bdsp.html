@@ -165,6 +165,29 @@ footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction:
 @media (prefers-reduced-motion: no-preference) {
   .rows a { transition: background 0.15s; }
 }
+
+/* v2: 点滅の回数を点の数で見せる（点の数＝1周の点滅回数） */
+.blink { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; min-width: 0; vertical-align: -2px; }
+.blink i {
+  width: 12px; height: 12px; border-radius: 50%; background: var(--c);
+  box-shadow: 0 0 0 1px var(--line), 0 0 6px color-mix(in srgb, var(--c) 70%, transparent);
+}
+.rows a { grid-template-columns: 84px 1fr; }
+.mode-head .blink i { width: 14px; height: 14px; }
+.mode .what { font-size: 1rem; }
+.mode h4 { margin: 0; font-size: 0.92rem; color: var(--muted); font-weight: 700; }
+.mode dl { grid-template-columns: 6.5em 1fr; }
+ul.check { list-style: none; padding-left: 0; }
+ul.check li { position: relative; padding-left: 1.5em; }
+ul.check li::before {
+  content: ""; position: absolute; left: 0.1em; top: 0.45em; width: 0.8em; height: 0.8em;
+  border: 1.5px solid var(--accent); border-radius: 3px;
+}
+ol.q { padding-left: 1.6em; }
+ol.q li::marker { color: var(--accent); font-weight: 700; }
+.ex { display: block; margin-top: 6px; font-size: 0.88rem; color: var(--muted); background: var(--code-bg); border-radius: 6px; padding: 6px 10px; }
+.callout { line-height: 1.9; }
+@media (max-width: 420px) { .rows a { grid-template-columns: 70px 1fr; } }
 </style>
 </head>
 <body>
@@ -174,206 +197,225 @@ footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction:
     <h1>BDSP多機能マクロ</h1>
   </header>
 
-  <section aria-labelledby="h-settings">
-    <h2 id="h-settings">先にやっておく設定</h2>
-    <ul>
-      <li>オプション：話の速さ はやい／戦闘アニメ みない／ニックネーム登録 しない／ボックスへ 自動で送る</li>
-      <li>メニュー（Xボタン）：左上に「ポケモン」、その真下（左下）に「タウンマップ」が来るように並べ替える</li>
-      <li>ゲームのバージョンは最新でOK（バグ技は使わない）</li>
-    </ul>
+  <section aria-labelledby="h-btn">
+    <h2 id="h-btn">ボタンは1つだけ</h2>
+    <p>ボードの「<b>BOOT</b>」と書かれたボタンを使います（「RESET」は押さない）。押し方は2つだけです。</p>
+    <div class="ops">
+      <div class="op"><span class="what">ちょん押し</span><span class="how">次の機能に変える</span></div>
+      <div class="op"><span class="what">1秒長押し</span><span class="how">スタート ／ ストップ</span></div>
+    </div>
   </section>
 
-  <section aria-labelledby="h-basic">
-    <h2 id="h-basic">使い方</h2>
-    <p class="note">押すのは基板の「BOOT」と書かれたボタン。「RESET」は押さない。登録中に青緑に光るのがBDSP多機能マクロ。</p>
+  <section aria-labelledby="h-flow">
+    <h2 id="h-flow">使う流れ</h2>
     <ol class="steps">
-      <li><strong>ゲーム側の準備をする</strong><span>下の「機能ごとの説明」にある開始位置・手持ちにしておく。ここまではいつものコントローラーで操作してOK。</span></li>
-      <li><strong>ボードをSwitchに挿す</strong><span>「コントローラー」→「持ちかた/順番を変える」を開いてから、ドックのUSB端子に挿す。LEDが青緑に光り、自動で登録される。点滅に変わったら完了。画面を閉じてゲームに戻る。</span></li>
-      <li><strong>ちょん押しで機能を選ぶ</strong><span>押すたびに次の機能に変わる。LEDの色と点滅の回数を、下の早見表で確認する。</span></li>
-      <li><strong>1秒長押しでスタート</strong><span>LEDが機能の色で光りっぱなしになったら動作中。回数を入れる機能は、先に水色の間に回数を入れる（下の「回数の入れ方」）。</span></li>
-      <li><strong>止めるときも1秒長押し</strong><span>終わりがある機能は、最後に本体がスリープする。</span></li>
+      <li><strong>ゲームの中で準備する</strong><span>下の機能の説明にある「スタート前にやること」とスタート位置を、いつものコントローラーでやっておく。</span></li>
+      <li><strong>ボードをSwitchに挿す</strong><span>先に「コントローラー」→「持ちかた/順番を変える」を開いてから、ドックのUSBに挿す。LEDが<b>青緑</b>に光って自動で登録される。点滅に変わったら完了。画面を閉じてゲームに戻る。</span></li>
+      <li><strong>ちょん押しで機能を選ぶ</strong><span>LEDが「色」と「点滅の回数」で今の機能を教えてくれる。下の一覧と見比べて、使いたい機能になるまでちょん押しする。</span></li>
+      <li><strong>1秒長押しでスタート</strong><span>回数を聞く機能は、LEDが<b>水色</b>になる。下の「回数の入れ方」のとおりに押す。LEDが機能の色で光りっぱなしになったら動いている。</span></li>
+      <li><strong>止めるときも1秒長押し</strong><span>終わりがある機能は自動で止まる。卵の機能は、最後に本体がスリープする。</span></li>
     </ol>
-    <h3>LEDの見方</h3>
-    <div class="table-scroll">
-      <table>
-        <thead><tr><th>光り方</th><th>状態</th></tr></thead>
-        <tbody>
-          <tr><td><span class="led c-teal"><i></i></span> 青緑で光りっぱなし</td><td>挿した直後。登録中</td></tr>
-          <tr><td>機能の色で点滅</td><td>待機中。点滅の回数と色で、選んでいる機能を表す</td></tr>
-          <tr><td>機能の色で光りっぱなし</td><td>動作中</td></tr>
-          <tr><td><span class="led c-cyan"><i></i></span> 水色</td><td>回数の入力待ち</td></tr>
-          <tr><td><span class="led c-white"><i></i></span> 白く一瞬光る</td><td>入力の1回を受け付けた</td></tr>
-        </tbody>
-      </table>
-    </div>
   </section>
 
   <section aria-labelledby="h-index">
-    <h2 id="h-index">LED早見表</h2>
+    <h2 id="h-index">機能の一覧</h2>
+    <p>止まっているあいだ、LEDは機能の色で<b>点の数だけ</b>点滅をくり返します。たとえば <span class="blink c-amber" aria-hidden="true"><i></i><i></i></span> は「黄色が2回ずつ点滅」＝ 卵を孵す。</p>
     <div class="index">
       <div class="group">
-        <div class="group-name">共通</div>
+        <div class="group-name">BDSP（LEDの色で種類が分かれる）</div>
         <div class="rows">
-          <a href="#w1"><span class="led c-white"><i></i><b>1</b></span><span class="name">A連打</span></a>
-        </div>
-      </div>
-      <div class="group">
-        <div class="group-name">卵</div>
-        <div class="rows">
-          <a href="#y1"><span class="led c-amber"><i></i><b>1</b></span><span class="name">卵受取</span></a>
-          <a href="#y2"><span class="led c-amber"><i></i><b>2</b></span><span class="name">卵孵化</span></a>
-          <a href="#y3"><span class="led c-amber"><i></i><b>3</b></span><span class="name">卵受取＆孵化</span></a>
-        </div>
-      </div>
-      <div class="group">
-        <div class="group-name">ボックス</div>
-        <div class="rows">
-          <a href="#g1"><span class="led c-green"><i></i><b>1</b></span><span class="name">ボックス逃がし</span></a>
-        </div>
-      </div>
-      <div class="group">
-        <div class="group-name">育成・金策</div>
-        <div class="rows">
-          <a href="#b1"><span class="led c-blue"><i></i><b>1</b></span><span class="name">経験値稼ぎ（地下大洞窟）</span></a>
-          <a href="#b2"><span class="led c-blue"><i></i><b>2</b></span><span class="name">地下金策</span></a>
-          <a href="#b3"><span class="led c-blue"><i></i><b>3</b></span><span class="name">地下金策 設定</span></a>
-          <a href="#b4"><span class="led c-blue"><i></i><b>4</b></span><span class="name">ふれあい広場（きのみ集め）</span></a>
-        </div>
-      </div>
-      <div class="group">
-        <div class="group-name">コンテスト</div>
-        <div class="rows">
-          <a href="#r1"><span class="led c-red"><i></i><b>1</b></span><span class="name">コンテスト（マスターランク）</span></a>
-          <a href="#r2"><span class="led c-red"><i></i><b>2</b></span><span class="name">コンテスト タイミング調整</span></a>
+          <a href="#w1"><span class="blink c-white" aria-label="白1回"><i></i></span><span class="name">A連打</span></a>
+          <a href="#y1"><span class="blink c-amber" aria-label="黄1回"><i></i></span><span class="name">卵を受け取る</span></a>
+          <a href="#y2"><span class="blink c-amber" aria-label="黄2回"><i></i><i></i></span><span class="name">卵を孵す</span></a>
+          <a href="#y3"><span class="blink c-amber" aria-label="黄3回"><i></i><i></i><i></i></span><span class="name">卵を受け取って孵す</span></a>
+          <a href="#g1"><span class="blink c-green" aria-label="緑1回"><i></i></span><span class="name">ボックスのポケモンを逃がす</span></a>
+          <a href="#b1"><span class="blink c-blue" aria-label="青1回"><i></i></span><span class="name">経験値稼ぎ（地下大洞窟）</span></a>
+          <a href="#b2"><span class="blink c-blue" aria-label="青2回"><i></i><i></i></span><span class="name">地下金策</span></a>
+          <a href="#b3"><span class="blink c-blue" aria-label="青3回"><i></i><i></i><i></i></span><span class="name">地下金策の設定</span></a>
+          <a href="#b4"><span class="blink c-blue" aria-label="青4回"><i></i><i></i><i></i><i></i></span><span class="name">ふれあい広場（きのみ集め）</span></a>
+          <a href="#r1"><span class="blink c-red" aria-label="赤1回"><i></i></span><span class="name">コンテスト（マスターランク）</span></a>
+          <a href="#r2"><span class="blink c-red" aria-label="赤2回"><i></i><i></i></span><span class="name">コンテストのタイミング調整</span></a>
         </div>
       </div>
     </div>
+    <p class="note">卵の3つは準備が共通です（<a href="#eggprep">卵の機能の共通準備</a>）。</p>
   </section>
 
   <section aria-labelledby="h-input">
     <h2 id="h-input">回数の入れ方</h2>
-    <p>水色に光っている4秒間に押した回数が数字になる。</p>
-    <div class="window-demo" aria-label="入力の例">
-      <span class="led c-cyan"><i></i></span><span class="slot">1回目 = 10の位</span><span class="arrow">→</span>
-      <span class="led c-cyan"><i></i></span><span class="slot">2回目 = 1の位</span>
-    </div>
+    <p>スタートすると、機能によってはLEDが<b>水色</b>になって数を聞いてきます。</p>
     <ul>
-      <li>12 → 1回目に1回、2回目に2回。ボックス数は何も押さなければ 1。</li>
+      <li>水色のあいだ（4秒）に押した回数が、その数になる。押すたびに白く光る。</li>
+      <li>何も押さなければ <b>0</b>。ただしボックス数は、何も押さなければ <b>1</b>。</li>
+      <li>水色が一度消えて、また水色になったら次の質問。</li>
     </ul>
-    <h3>卵のサイクル数</h3>
-    <div class="table-scroll">
-      <table>
-        <thead><tr><th>押す回数</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7以上</th></tr></thead>
-        <tbody><tr><th>サイクル</th><td class="num">40</td><td class="num">5</td><td class="num">10</td><td class="num">15</td><td class="num">20</td><td class="num">25</td><td class="num">30</td><td class="num">35</td></tr></tbody>
-      </table>
+    <div class="callout">
+      <b>例：卵を「12ボックス」分もらいたいとき</b>（質問が2回くる）<br>
+      1回目の水色 → <b>1回</b>押す（10の位）<br>
+      2回目の水色 → <b>2回</b>押す（1の位）<br>
+      3ボックスなら、1回目は押さずに待って、2回目に3回押す。
     </div>
+  </section>
+
+  <section aria-labelledby="h-settings">
+    <h2 id="h-settings">最初に1回だけやっておくこと</h2>
+    <ul class="check">
+      <li>ゲームのオプション：話の速さ「はやい」／戦闘アニメ「みない」／ニックネーム登録「しない」／ボックスへ「自動で送る」</li>
+      <li>メニュー（Xボタン）の並び：左上に「ポケモン」、その真下（左下）に「タウンマップ」が来るように並べ替える</li>
+      <li>ゲームのバージョンは最新のままでよい（バグ技は使わない）</li>
+    </ul>
   </section>
 
   <section aria-labelledby="h-modes">
     <h2 id="h-modes">機能ごとの説明</h2>
 
     <article class="mode" id="w1">
-      <div class="mode-head"><span class="led c-white"><i></i><b>1</b></span><h3>A連打</h3></div>
+      <div class="mode-head"><span class="blink c-white" aria-label="白1回"><i></i></span><h3>A連打</h3></div>
+      <p class="what">Aボタンを押し続ける。</p>
       <dl>
-        <dt>動き</dt><dd>Aボタンを押し続ける。</dd>
-        <dt>開始</dt><dd>どこでも</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>どこでも</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
       </dl>
     </article>
 
     <article class="mode" id="eggprep">
       <div class="mode-head"><h3>卵の機能の共通準備</h3></div>
-      <ul>
-        <li>自転車を<strong>十字キー上</strong>（＋ボタンで出るリストの上）に登録。ギアはマッハにしておく。</li>
-        <li>ズイタウンの育て屋（はらっぱ）に、卵ができる2匹を預ける。</li>
-        <li><strong>ズイタウンのポケモンセンターの前</strong>に立ってスタートする（最初にズイタウンへ「そらをとぶ」して位置を合わせる）。</li>
+      <p class="what">卵の3つの機能（黄1〜黄3）で、先にやっておくこと。</p>
+      <ul class="check">
+        <li>自転車を<b>十字キー上</b>（＋ボタンで出るリストの上）に登録する。ギアはマッハにしておく</li>
+        <li>ズイタウンの育て屋（はらっぱ）に、卵ができる2匹を預ける</li>
+        <li>ズイタウンへ「そらをとぶ」して位置を合わせ、<b>ズイタウンのポケモンセンターの前</b>に立つ。ここからスタートする</li>
       </ul>
     </article>
 
     <article class="mode" id="y1">
-      <div class="mode-head"><span class="led c-amber"><i></i><b>1</b></span><h3>卵受取</h3></div>
+      <div class="mode-head"><span class="blink c-amber" aria-label="黄1回"><i></i></span><h3>卵を受け取る</h3></div>
+      <p class="what">育て屋の前で回って卵をもらう、をくり返す。卵はボックスに送られる。ボックス数×30個もらったら本体がスリープする。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li><a href="#eggprep">卵の機能の共通準備</a>をする</li>
+        <li>手持ちを<b>6匹</b>にする（卵がボックスに送られるように）</li>
+        <li>空きボックスを用意する</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>育て屋の前で回って卵をもらう、をくり返す。ボックス数×30個もらったら本体がスリープする。</dd>
-        <dt>準備</dt><dd>手持ちを<strong>6匹</strong>にする（卵がボックスに送られるように）。空きボックスを用意する。</dd>
-        <dt>開始</dt><dd>ズイタウンのポケモンセンターの前</dd>
-        <dt>入力</dt><dd>水色2回：ボックス数（10の位 → 1の位）</dd>
+        <dt>スタート位置</dt><dd>ズイタウンのポケモンセンターの前</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>ボックス数の10の位</li>
+            <li>ボックス数の1の位</li>
+          </ol>
+          <span class="ex">例：2ボックス分（60個）→ ①押さない ②2回。どちらも押さなければ1ボックス分</span>
+        </dd>
+        <dt>終わり</dt><dd>もらい終わると本体がスリープする</dd>
       </dl>
     </article>
 
     <article class="mode" id="y2">
-      <div class="mode-head"><span class="led c-amber"><i></i><b>2</b></span><h3>卵孵化</h3></div>
+      <div class="mode-head"><span class="blink c-amber" aria-label="黄2回"><i></i><i></i></span><h3>卵を孵す</h3></div>
+      <p class="what">ボックスの卵を左の列から5個ずつ手持ちに入れ、育て屋の前で回って孵す。孵ったポケモンはボックスに戻す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li><a href="#eggprep">卵の機能の共通準備</a>をする</li>
+        <li>手持ちは特性「ほのおのからだ」などのポケモン<b>1匹だけ</b></li>
+        <li>卵で埋まったボックスを並べ、<b>最初の卵のボックスを開いた状態</b>でボックスを閉じる</li>
+        <li>卵は同じ歩数のものだけにする</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>ボックスの卵を左の列から5個ずつ手持ちに入れ、育て屋の前で回って孵す。孵ったポケモンはボックスに戻す。終わったら本体がスリープする。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>手持ちは とくせい「ほのおのからだ」などのポケモン<strong>1匹だけ</strong>。</li>
-            <li>卵で埋まったボックスを並べ、<strong>最初の卵のボックスを開いた状態で閉じておく</strong>。</li>
-            <li>同じ歩数の卵だけにする。</li>
-          </ul>
+        <dt>スタート位置</dt><dd>ズイタウンのポケモンセンターの前</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>卵のサイクル数（<a href="#cycle">下の表</a>）</li>
+            <li>ボックス数の10の位</li>
+            <li>ボックス数の1の位</li>
+          </ol>
+          <span class="ex">例：サイクル20の卵を3ボックス → ①4回 ②押さない ③3回</span>
         </dd>
-        <dt>開始</dt><dd>ズイタウンのポケモンセンターの前</dd>
-        <dt>入力</dt><dd>水色3回：サイクル数 → ボックス数の10の位 → 1の位</dd>
+        <dt>終わり</dt><dd>全部孵すと本体がスリープする</dd>
       </dl>
     </article>
 
     <article class="mode" id="y3">
-      <div class="mode-head"><span class="led c-amber"><i></i><b>3</b></span><h3>卵受取＆孵化</h3></div>
+      <div class="mode-head"><span class="blink c-amber" aria-label="黄3回"><i></i><i></i><i></i></span><h3>卵を受け取って孵す</h3></div>
+      <p class="what">先にボックス数×30個の卵をもらい、そのあと全部孵す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li><a href="#eggprep">卵の機能の共通準備</a>をする</li>
+        <li>手持ちの1番目に特性「ほのおのからだ」などのポケモン、2〜6番目に適当なポケモン（卵以外）</li>
+        <li>ボックス1から、使うボックス数だけ空にする</li>
+        <li>その1つ前のボックス（いちばん最後のボックス）に、5匹分以上の空きを作る（手持ちの2〜6番目が入る）</li>
+        <li>空にした<b>ボックス1を開いた状態</b>でボックスを閉じる</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>先にボックス数×30個の卵をもらい、そのあと全部孵す。終わったら本体がスリープする。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>手持ちの先頭を とくせい「ほのおのからだ」などのポケモン、2〜6番目を適当なポケモン（卵以外）にする。</li>
-            <li>ボックス1から、使うボックス数だけ空にする。さらにその1つ前のボックス（最後のボックス）に5匹分以上の空きを作る（手持ちの2〜6番目が入る）。</li>
-            <li>空にした<strong>ボックス1を開いた状態で閉じておく</strong>。</li>
-          </ul>
+        <dt>スタート位置</dt><dd>ズイタウンのポケモンセンターの前</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>卵のサイクル数（<a href="#cycle">下の表</a>）</li>
+            <li>ボックス数の10の位</li>
+            <li>ボックス数の1の位</li>
+          </ol>
+          <span class="ex">例：サイクル20の卵を2ボックス分（60個）→ ①4回 ②押さない ③2回</span>
         </dd>
-        <dt>開始</dt><dd>ズイタウンのポケモンセンターの前</dd>
-        <dt>入力</dt><dd>水色3回：サイクル数 → ボックス数の10の位 → 1の位</dd>
+        <dt>終わり</dt><dd>全部孵すと本体がスリープする</dd>
       </dl>
     </article>
 
     <article class="mode" id="g1">
-      <div class="mode-head"><span class="led c-green"><i></i><b>1</b></span><h3>ボックス逃がし</h3></div>
+      <div class="mode-head"><span class="blink c-green" aria-label="緑1回"><i></i></span><h3>ボックスのポケモンを逃がす</h3></div>
+      <p class="what">ボックスのポケモンを左上から順に逃がす。決めたボックス数を逃がしたら止まる。<b>逃がしたポケモンは戻らない。</b></p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>逃がすボックスは30匹すべて埋める（空きやタマゴがあるとずれる）</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>ボックスのポケモンを左上から順に逃がす。指定したボックス数を逃がしたら止まる。</dd>
-        <dt>準備</dt><dd>逃がすボックスは30匹すべて埋めておく（空きやタマゴがあるとずれる）。</dd>
-        <dt>開始</dt><dd>ボックス画面で、カーソルを左上に合わせた状態（範囲選択ではなく、ふつうの選択）</dd>
-        <dt>入力</dt><dd>水色2回：ボックス数（10の位 → 1の位）</dd>
+        <dt>スタート位置</dt><dd>ボックス画面で、カーソルを左上に合わせた状態（範囲選択ではなく、ふつうの選択）</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>ボックス数の10の位</li>
+            <li>ボックス数の1の位</li>
+          </ol>
+          <span class="ex">例：4ボックス → ①押さない ②4回</span>
+        </dd>
       </dl>
     </article>
 
     <article class="mode" id="b1">
-      <div class="mode-head"><span class="led c-blue"><i></i><b>1</b></span><h3>経験値稼ぎ（地下大洞窟）</h3></div>
+      <div class="mode-head"><span class="blink c-blue" aria-label="青1回"><i></i></span><h3>経験値稼ぎ（地下大洞窟）</h3></div>
+      <p class="what">地下大洞窟の「ふぶきのくうどう」を左右に歩いて野生と戦い、PPが減ったら右下の山男に戻って回復する、をくり返す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>手持ちの1番目に戦わせるポケモン。<b>いちばん上の技</b>は、命中100で接触しない技、出てくる相手を2発以内で倒せるもの（草・虫・岩・悪・フェアリーがおすすめ。こだわりメガネなども）</li>
+        <li>2〜6番目に育てたいポケモン</li>
+        <li>ひみつきちに水（トドゼルガ）や氷の石像を置いて、出てくるポケモンを寄せる。電気・鋼・岩の石像は置かない（がんじょうで長引く）</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>地下大洞窟の「ふぶきのくうどう」を左右に歩いて野生と戦い、PPが減ったら右下の山男（回復）に戻る、をくり返す。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>手持ちの先頭：戦わせるポケモン。<strong>1番上の技</strong>は命中100の非接触技で、出てくる相手を2発以内で倒せるもの（草・虫・岩・悪・フェアリーがおすすめ。こだわりメガネなども）。</li>
-            <li>2〜6番目：育てたいポケモン。</li>
-            <li>ひみつきちに水（トドゼルガ）や氷の石像を置いて出現を寄せる。電気・鋼・岩の石像は避ける（がんじょうで長引く）。</li>
-          </ul>
+        <dt>スタート位置</dt><dd>キッサキシティから地下に入ったマップの右下、回復してくれる山男の<b>左隣</b></dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>回復までの往復回数（使う技のPP÷2くらい。押さなければ10）</li>
+          </ol>
+          <span class="ex">例：PPが16の技 → ①8回</span>
         </dd>
-        <dt>開始</dt><dd>キッサキシティから地下に入ったマップの右下、回復してくれる山男の<strong>左隣</strong></dd>
-        <dt>入力</dt><dd>水色1回：回復までの往復回数（使う技のPP÷2くらい。0回なら10）</dd>
+        <dt>止め方</dt><dd>1秒長押し</dd>
       </dl>
     </article>
 
     <article class="mode" id="b2">
-      <div class="mode-head"><span class="led c-blue"><i></i><b>2</b></span><h3>地下金策</h3></div>
+      <div class="mode-head"><span class="blink c-blue" aria-label="青2回"><i></i><i></i></span><h3>地下金策</h3></div>
+      <p class="what">トバリデパートで台座を買う → 地下の山男で台座を玉に替え、玉で技マシンに交換する → デパートで技マシンを売る、をくり返す。お小遣いがたまったら、設定に合わせてドーピングアイテムを買って続けるか、止まる。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>探検セットを<b>十字キー左</b>（＋ボタンで出るリストの左）に登録する</li>
+        <li>その日の交換レートを、地下の小さい玉交換の山男（トバリから入って南南西）で見て、黒字になる技マシンを探す（下の表）</li>
+        <li>その技マシンを1個以上交換して、バッグでお気に入りにし、技マシンの<b>いちばん上</b>に並べる</li>
+        <li>四角い台座・円形の台座を持っていたら0個にする。ほかの台座は数個持っておく（バッグの台座が空にならないように）</li>
+        <li>先に<a href="#b3">地下金策の設定</a>をする</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>トバリデパートで台座を買う → 地下の山男で台座を玉に替え、玉で技マシンに交換 → デパートで技マシンを売る、をくり返す。お小遣いがたまったら、設定に合わせてドーピングアイテムを買って続けるか、止まる。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>探検セットを<strong>十字キー左</strong>（＋ボタンで出るリストの左）に登録。</li>
-            <li>その日の交換レートを地下の小さい玉交換の山男（トバリから入って南南西）で確認し、黒字になる技マシンを探す（下の表）。</li>
-            <li>その技マシンを1個以上交換して、バッグでお気に入りにし、技マシンの<strong>一番上</strong>に並べる。</li>
-            <li>四角い台座・円形の台座は持っていたら0個にする。ほかの台座は数個持っておく（バッグの台座が空にならないように）。</li>
-            <li>先に<a href="#b3">地下金策 設定</a>をする。</li>
-          </ul>
-        </dd>
-        <dt>開始</dt><dd>トバリデパートの入り口の前</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>トバリデパートの入り口の前</dd>
+        <dt>聞かれる数</dt><dd>なし（<a href="#b3">地下金策の設定</a>で入れた値を使う）</dd>
+        <dt>止め方</dt><dd>設定の9番目で「止まる」にしていれば、お小遣いがたまると止まる。途中で止めるときは1秒長押し</dd>
       </dl>
+      <h4>黒字になる技マシン</h4>
       <div class="table-scroll">
         <table>
           <thead><tr><th>売値</th><th>黒字になる玉の数</th><th>技マシン</th></tr></thead>
@@ -389,73 +431,120 @@ footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction:
     </article>
 
     <article class="mode" id="b3">
-      <div class="mode-head"><span class="led c-blue"><i></i><b>3</b></span><h3>地下金策 設定</h3></div>
-      <p>交換レートが変わったときや、始める前にやる。値は保存される。</p>
+      <div class="mode-head"><span class="blink c-blue" aria-label="青3回"><i></i><i></i><i></i></span><h3>地下金策の設定</h3></div>
+      <p class="what">地下金策で使う値を入れて保存する。始める前と、交換レートが変わったときにやる。</p>
       <dl>
-        <dt>入力</dt><dd>
-          水色9回
-          <ul>
-            <li>1回目：技マシンの売値（1回＝2750円／2回＝1500円／3回＝1250円／4回＝1000円）</li>
-            <li>2回目：玉の色（0回＝赤／1回以上＝青）</li>
-            <li>3〜4回目：玉の個数の十の位 → 一の位</li>
-            <li>5回目：その技マシンが交換リストの上から何段目か（0回なら10）</li>
-            <li>6〜8回目：今の所持金（千円単位）の百の位 → 十の位 → 一の位（1万円なら 0・1・0）</li>
-            <li>9回目：お小遣いがたまったら（0回＝ドーピングアイテムを買って続ける／1回以上＝技マシンを売って止まる）</li>
-          </ul>
+        <dt>スタート位置</dt><dd>どこでも（ゲームは動かさない）</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>技マシンの売値：1回＝2750円 ／ 2回＝1500円 ／ 3回＝1250円 ／ 4回＝1000円</li>
+            <li>玉の色：押さない＝赤 ／ 1回以上＝青</li>
+            <li>玉の個数の10の位</li>
+            <li>玉の個数の1の位</li>
+            <li>その技マシンが交換リストの上から何段目か（押さなければ10段目）</li>
+            <li>今の所持金（千円単位）の100の位</li>
+            <li>今の所持金（千円単位）の10の位</li>
+            <li>今の所持金（千円単位）の1の位</li>
+            <li>お小遣いがたまったら：押さない＝ドーピングアイテムを買って続ける ／ 1回以上＝技マシンを売って止まる</li>
+          </ol>
+          <span class="ex">例：1500円の技マシン、赤い玉15個、リストの3段目、所持金25万円、たまったら止める → ①2回 ②押さない ③1回 ④5回 ⑤3回 ⑥2回 ⑦5回 ⑧押さない ⑨1回</span>
+          <span class="ex">所持金が1万円なら ⑥押さない ⑦1回 ⑧押さない</span>
         </dd>
-        <dt>結果</dt><dd>黄（売値）→ 白（1回＝赤／2回＝青）→ 水色（玉の個数）→ 緑（段）→ 青（所持金）の順に点滅で知らせる。0は長く1回。</dd>
+        <dt>結果</dt><dd>入れ終わると、保存した値を点滅で知らせる。順番は 黄（売値）→ 白（1回＝赤い玉、2回＝青い玉）→ 水色（玉の個数）→ 緑（段）→ 青（所持金）。数は1けたずつ点滅の回数で出て、0は長く1回光る。</dd>
       </dl>
-      <p class="note">売値・玉の個数・所持金は、0回のままだと前の値が残る。所持金は毎回入れ直す。</p>
+      <p class="note">売値・玉の個数・所持金は、押さないままだと前の値が残る。所持金は毎回入れ直す。</p>
     </article>
 
     <article class="mode" id="b4">
-      <div class="mode-head"><span class="led c-blue"><i></i><b>4</b></span><h3>ふれあい広場（きのみ集め）</h3></div>
+      <div class="mode-head"><span class="blink c-blue" aria-label="青4回"><i></i><i></i><i></i><i></i></span><h3>ふれあい広場（きのみ集め）</h3></div>
+      <p class="what">ポケモン6匹を連れて広場を回り、1匹ずつ話しかけて、拾ったきのみやボールを受け取る、をくり返す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>手持ちをブイズの進化形6匹にする（1番目だけは足の速い別のポケモンでもよい）。シャワーズはダイブボールを拾ってくることがある</li>
+        <li>広場に入ったら＋ボタン（口笛）で全員呼ぶ</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>ポケモン6匹を連れて広場を回り、1匹ずつ話しかけて拾ったきのみやボールを受け取る、をくり返す。</dd>
-        <dt>準備</dt><dd>手持ちをブイズの進化形6匹にする（先頭だけは足の速い別のポケモンでもOK）。シャワーズはダイブボールを拾ってくることがある。広場に入ったら＋ボタン（口笛）で全員呼ぶ。</dd>
-        <dt>開始</dt><dd>広場の左下、受付のお姉さんの視線の先にある白いフェンスの右側</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>広場の左下、受付のお姉さんの視線の先にある白いフェンスの右側</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+        <dt>止め方</dt><dd>1秒長押し</dd>
       </dl>
     </article>
 
     <article class="mode" id="r1">
-      <div class="mode-head"><span class="led c-red"><i></i><b>1</b></span><h3>コンテスト（マスターランク）</h3></div>
+      <div class="mode-head"><span class="blink c-red" aria-label="赤1回"><i></i></span><h3>コンテスト（マスターランク）</h3></div>
+      <p class="what">マスターランクに出て、ダンスのリズムに合わせてAを押す、をくり返す。3回に1回くらい優勝できる。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>全部門のノーマル〜ウルトラをクリアして、マスターランクに出られるようにする</li>
+        <li>出るポケモンを手持ちの<b>1番目</b>にして、ポフィンでコンディションとけづやを上げておく</li>
+        <li>技のいちばん上を効果の高い技にする（ギガインパクトがおすすめ）</li>
+        <li>ボールカプセルを部門ごとに用意する。カプセル選択の<b>1段目</b>に左から かっこよさ・うつくしさ・かわいさ・かしこさ、<b>2段目</b>に たくましさ・ブリリアントシャイニング。部門に合ったシールを20枚ずつ貼る</li>
+        <li>メニューのカーソルをトレーナーカードに合わせておく</li>
+        <li>コンテスト会場で受付（中央）を向いてレポートを書く</li>
+        <li>先に<a href="#r2">コンテストのタイミング調整</a>で、かっこよさのタイミングを合わせる</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>マスターランクに出て、ダンスのリズムに合わせてAを押す、をくり返す。3回に1回くらい優勝できる。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>全部門のノーマル〜ウルトラをクリアして、マスターランクに出られるようにする。</li>
-            <li>出るポケモンを手持ちの<strong>先頭</strong>にして、ポフィンでコンディションとけづやを上げておく。技の一番上を効果の高い技にする（ギガインパクトがおすすめ）。</li>
-            <li>ボールカプセルを部門ごとに用意する。カプセル選択の<strong>1段目</strong>に左から かっこよさ・うつくしさ・かわいさ・かしこさ、<strong>2段目</strong>に たくましさ・ブリリアントシャイニング。部門に合ったシールを20枚ずつ貼る。</li>
-            <li>コンテスト会場で受付（中央）を向いてレポート。メニューのカーソルはトレーナーカードに合わせておく。</li>
-            <li>先に<a href="#r2">タイミング調整</a>でかっこよさを合わせる。</li>
-          </ul>
+        <dt>スタート位置</dt><dd>コンテスト会場の受付（中央）の前</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>部門：押さない＝かっこよさ〜たくましさを5回ずつ → そのあとブリリアントシャイニングをずっとくり返す（リボン集め）／ 1回＝かっこよさ ／ 2回＝うつくしさ ／ 3回＝かわいさ ／ 4回＝かしこさ ／ 5回＝たくましさ ／ 6回＝ブリリアントシャイニング（その部門だけをくり返す）</li>
+          </ol>
+          <span class="ex">例：うつくしさだけを回す → ①2回</span>
         </dd>
-        <dt>開始</dt><dd>コンテスト会場の受付（中央）の前</dd>
-        <dt>入力</dt><dd>水色1回：部門
-          <ul>
-            <li>0回：かっこよさ〜たくましさを5回ずつ → ブリリアントシャイニングをずっとくり返す（リボン集め）</li>
-            <li>1回 かっこよさ／2回 うつくしさ／3回 かわいさ／4回 かしこさ／5回 たくましさ／6回 ブリリアントシャイニング：その部門だけくり返す</li>
-          </ul>
-        </dd>
+        <dt>止め方</dt><dd>1秒長押し</dd>
       </dl>
     </article>
 
     <article class="mode" id="r2">
-      <div class="mode-head"><span class="led c-red"><i></i><b>2</b></span><h3>コンテスト タイミング調整</h3></div>
-      <p>ロード時間は本体ごとに違うので、最初に合わせる。値は保存される。</p>
+      <div class="mode-head"><span class="blink c-red" aria-label="赤2回"><i></i><i></i></span><h3>コンテストのタイミング調整</h3></div>
+      <p class="what">Aを押すタイミングを0.1秒単位でずらして保存する。ロード時間は本体ごとに違うので、最初に合わせる。</p>
+      <h4>合わせ方</h4>
       <ol>
-        <li>コンテストを部門1（かっこよさ）で何回か動かして見る。曲の2小節目の2拍目（空白）で技が出るのが正しいタイミング。</li>
-        <li>入力が早いなら遅らせる、遅いなら早める（1拍＝0.6秒）。毎回0.5秒くらいぶれるので、何回か見て平均で決める。</li>
-        <li>かっこよさが5回以内に優勝できればOK。</li>
+        <li>コンテストを部門1（かっこよさ）で何回か動かして見る。曲の2小節目の2拍目（空白のところ）で技が出れば正しい。</li>
+        <li>技が早く出るなら遅らせる、遅く出るなら早める（1拍＝0.6秒）。毎回0.5秒くらいぶれるので、何回か見て平均で決める。</li>
+        <li>かっこよさで5回以内に優勝できればOK。</li>
       </ol>
       <dl>
-        <dt>入力</dt><dd>水色2回：遅らせる回数 → 早める回数（1回＝0.1秒）。どちらも0回なら元に戻す。</dd>
-        <dt>結果</dt><dd>今の調整量を点滅で知らせる（白＝遅らせた0.1秒の数／黄＝早めた0.1秒の数／水色1回＝元のまま）</dd>
+        <dt>スタート位置</dt><dd>どこでも（ゲームは動かさない）</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>遅らせる回数（1回＝0.1秒）</li>
+            <li>早める回数（1回＝0.1秒）</li>
+          </ol>
+          <span class="ex">例：0.3秒遅らせる → ①3回 ②押さない。押した分は、今までの調整に足される。どちらも押さなければ元に戻る</span>
+        </dd>
+        <dt>結果</dt><dd>今の調整量を点滅で知らせる。白＝遅らせた0.1秒の数 ／ 黄＝早めた0.1秒の数 ／ 水色1回＝元のまま</dd>
       </dl>
     </article>
+  </section>
 
-    <a class="top-link" href="#top">早見表に戻る</a>
+  <section aria-labelledby="cycle">
+    <h2 id="cycle">卵のサイクル数</h2>
+    <p>孵すポケモンのサイクル数（攻略サイトの図鑑に載っている）に合わせて押す。</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>押す回数</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7以上</th></tr></thead>
+        <tbody><tr><th>サイクル</th><td class="num">40</td><td class="num">5</td><td class="num">10</td><td class="num">15</td><td class="num">20</td><td class="num">25</td><td class="num">30</td><td class="num">35</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-led">
+    <h2 id="h-led">LEDの光り方</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>光り方</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>青緑で光りっぱなし</td><td>挿した直後。登録中</td></tr>
+          <tr><td>機能の色で点滅をくり返す</td><td>止まっている。点滅の回数と色で今の機能が分かる</td></tr>
+          <tr><td>機能の色で光りっぱなし</td><td>動いている</td></tr>
+          <tr><td>水色</td><td>数を聞いている（4秒間）</td></tr>
+          <tr><td>白く一瞬光る</td><td>押した1回を数えた</td></tr>
+          <tr><td>設定のあとにいろいろな色で点滅</td><td>保存した値を知らせている（地下金策の設定、コンテストのタイミング調整）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <a class="top-link" href="#top">上に戻る</a>
   </section>
 </div>
 </body>

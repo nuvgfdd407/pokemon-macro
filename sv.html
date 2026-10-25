@@ -166,6 +166,29 @@ footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction:
 @media (prefers-reduced-motion: no-preference) {
   .rows a { transition: background 0.15s; }
 }
+
+/* v2: 点滅の回数を点の数で見せる（点の数＝1周の点滅回数） */
+.blink { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; min-width: 0; vertical-align: -2px; }
+.blink i {
+  width: 12px; height: 12px; border-radius: 50%; background: var(--c);
+  box-shadow: 0 0 0 1px var(--line), 0 0 6px color-mix(in srgb, var(--c) 70%, transparent);
+}
+.rows a { grid-template-columns: 84px 1fr; }
+.mode-head .blink i { width: 14px; height: 14px; }
+.mode .what { font-size: 1rem; }
+.mode h4 { margin: 0; font-size: 0.92rem; color: var(--muted); font-weight: 700; }
+.mode dl { grid-template-columns: 6.5em 1fr; }
+ul.check { list-style: none; padding-left: 0; }
+ul.check li { position: relative; padding-left: 1.5em; }
+ul.check li::before {
+  content: ""; position: absolute; left: 0.1em; top: 0.45em; width: 0.8em; height: 0.8em;
+  border: 1.5px solid var(--accent); border-radius: 3px;
+}
+ol.q { padding-left: 1.6em; }
+ol.q li::marker { color: var(--accent); font-weight: 700; }
+.ex { display: block; margin-top: 6px; font-size: 0.88rem; color: var(--muted); background: var(--code-bg); border-radius: 6px; padding: 6px 10px; }
+.callout { line-height: 1.9; }
+@media (max-width: 420px) { .rows a { grid-template-columns: 70px 1fr; } }
 </style>
 </head>
 <body>
@@ -175,104 +198,72 @@ footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction:
     <h1>SV多機能マクロ Switch・Switch 2</h1>
   </header>
 
-  <section aria-labelledby="h-settings">
-    <h2 id="h-settings">先にやっておく設定</h2>
-    <ul>
-      <li>オプション：話のはやさ はやい／わざ覚えスキップ する／手持ち・ボックス 自動で送る／ニックネーム登録 しない</li>
-      <li>マップ：開いて右スティック押し込みで「北が上」に固定</li>
-      <li>オフラインにしておく（テラレイド ホスト以外）</li>
-      <li>青の機能：本体の「インターネットで時刻を合わせる」オフ</li>
-      <li>本体の種類：Switch 1（Lite含む）で使うときは、<a href="#p1">紫1の「本体切替」</a>で切り替える。最初は Switch 2</li>
-    </ul>
+  <section aria-labelledby="h-btn">
+    <h2 id="h-btn">ボタンは1つだけ</h2>
+    <p>ボードの「<b>BOOT</b>」と書かれたボタンを使います（「RESET」は押さない）。押し方は2つだけです。</p>
+    <div class="ops">
+      <div class="op"><span class="what">ちょん押し</span><span class="how">次の機能に変える</span></div>
+      <div class="op"><span class="what">1秒長押し</span><span class="how">スタート ／ ストップ</span></div>
+    </div>
   </section>
 
-  <section aria-labelledby="h-basic">
-    <h2 id="h-basic">使い方</h2>
-    <p class="note">押すのは基板の「BOOT」と書かれたボタン。「RESET」は押さない。</p>
+  <section aria-labelledby="h-flow">
+    <h2 id="h-flow">使う流れ</h2>
     <ol class="steps">
-      <li><strong>ゲーム側の準備をする</strong><span>下の「機能ごとの説明」にある開始位置・手持ちにしておく。ここまではいつものコントローラーで操作してOK。</span></li>
-      <li><strong>ボードをSwitchに挿す</strong><span>「コントローラー」→「持ちかた/順番を変える」を開いてから、ドックのUSB端子に挿す。LEDがすみれ色に光り、自動で登録される。続けて白の点滅で本体の設定を知らせる（1回＝Switch 1、2回＝Switch 2）。点滅に変わったら完了。画面を閉じてゲームに戻る。</span></li>
-      <li><strong>ちょん押しで機能を選ぶ</strong><span>押すたびに次の機能に変わる。LEDの色と点滅の回数を、下の早見表で確認する。</span></li>
-      <li><strong>1秒長押しでスタート</strong><span>LEDが機能の色で光りっぱなしになったら動作中。回数を入れる機能は、先に水色の間に回数を入れる（下の「回数の入れ方」）。</span></li>
+      <li><strong>ゲームの中で準備する</strong><span>下の機能の説明にある「スタート前にやること」を、いつものコントローラーでやっておく。</span></li>
+      <li><strong>ボードをSwitchに挿す</strong><span>先に「コントローラー」→「持ちかた/順番を変える」を開いてから、ドックのUSBに挿す。LEDが<b>すみれ色</b>に光って自動で登録される。続けて白の点滅で本体の設定が分かる（1回＝Switch 1、2回＝Switch 2）。機能の色の点滅に変わったら完了。画面を閉じてゲームに戻る。</span></li>
+      <li><strong>ちょん押しで機能を選ぶ</strong><span>LEDが「色」と「点滅の回数」で今の機能を教えてくれる。下の一覧と見比べて、使いたい機能になるまでちょん押しする。</span></li>
+      <li><strong>1秒長押しでスタート</strong><span>回数を聞く機能は、LEDが<b>水色</b>になる。下の「回数の入れ方」のとおりに押す。LEDが機能の色で光りっぱなしになったら動いている。</span></li>
       <li><strong>止めるときも1秒長押し</strong><span>終わりがある機能は、最後に本体がスリープする。</span></li>
     </ol>
-    <h3>LEDの見方</h3>
-    <div class="table-scroll">
-      <table>
-        <thead><tr><th>光り方</th><th>状態</th></tr></thead>
-        <tbody>
-          <tr><td><span class="led c-violet"><i></i></span> すみれ色で光りっぱなし</td><td>挿した直後。登録中</td></tr>
-          <tr><td><span class="led c-white"><i></i></span> 白で1回か2回点滅</td><td>登録の直後。本体の設定（1回＝Switch 1、2回＝Switch 2）</td></tr>
-          <tr><td>機能の色で点滅</td><td>待機中。点滅の回数と色で、選んでいる機能を表す</td></tr>
-          <tr><td>機能の色で光りっぱなし</td><td>動作中</td></tr>
-          <tr><td><span class="led c-cyan"><i></i></span> 水色</td><td>回数の入力待ち</td></tr>
-          <tr><td><span class="led c-white"><i></i></span> 白く一瞬光る</td><td>入力の1回を受け付けた</td></tr>
-        </tbody>
-      </table>
-    </div>
   </section>
 
   <section aria-labelledby="h-index">
-    <h2 id="h-index">LED早見表</h2>
+    <h2 id="h-index">機能の一覧</h2>
+    <p>止まっているあいだ、LEDは機能の色で<b>点の数だけ</b>点滅をくり返します。たとえば <span class="blink c-amber" aria-hidden="true"><i></i><i></i></span> は「黄色が2回ずつ点滅」＝ 卵孵化。</p>
     <div class="index">
       <div class="group">
-        <div class="group-name">共通</div>
+        <div class="group-name">SV（LEDの色で種類が分かれる。設定の紫も同じ一覧）</div>
         <div class="rows">
-          <a href="#w1"><span class="led c-white"><i></i><b>1</b></span><span class="name">A連打</span></a>
-        </div>
-      </div>
-      <div class="group">
-        <div class="group-name">卵</div>
-        <div class="rows">
-          <a href="#y1"><span class="led c-amber"><i></i><b>1</b></span><span class="name">卵受取</span></a>
-          <a href="#y2"><span class="led c-amber"><i></i><b>2</b></span><span class="name">卵孵化</span></a>
-        </div>
-      </div>
-      <div class="group">
-        <div class="group-name">ボックス</div>
-        <div class="rows">
-          <a href="#g1"><span class="led c-green"><i></i><b>1</b></span><span class="name">ボックス逃がし</span></a>
-        </div>
-      </div>
-      <div class="group">
-        <div class="group-name">日付を使う機能・プリンター</div>
-        <div class="rows">
-          <a href="#b1"><span class="led c-blue"><i></i><b>1</b></span><span class="name">競り</span></a>
-          <a href="#b2"><span class="led c-blue"><i></i><b>2</b></span><span class="name">コレクレーのコイン</span></a>
-          <a href="#b3"><span class="led c-blue"><i></i><b>3</b></span><span class="name">どうぐプリンター 乱数</span></a>
-          <a href="#b4"><span class="led c-blue"><i></i><b>4</b></span><span class="name">どうぐプリンター 回数指定</span></a>
-        </div>
-      </div>
-      <div class="group">
-        <div class="group-name">周回</div>
-        <div class="rows">
-          <a href="#r1"><span class="led c-red"><i></i><b>1</b></span><span class="name">学校最強大会</span></a>
-          <a href="#r2"><span class="led c-red"><i></i><b>2</b></span><span class="name">テラレイド ホスト（ローカル）</span></a>
-          <a href="#r3"><span class="led c-red"><i></i><b>3</b></span><span class="name">BP集め（そらとぶタイムアタック）</span></a>
-          <a href="#r4"><span class="led c-red"><i></i><b>4</b></span><span class="name">素材集め（その場でレッツゴー）</span></a>
-        </div>
-      </div>
-      <div class="group">
-        <div class="group-name">設定</div>
-        <div class="rows">
-          <a href="#p1"><span class="led c-purple"><i></i><b>1</b></span><span class="name">本体切替（Switch 2 ⇔ Switch 1）</span></a>
-          <a href="#p2"><span class="led c-purple"><i></i><b>2</b></span><span class="name">日付+1 テスト</span></a>
+          <a href="#w1"><span class="blink c-white" aria-label="白1回"><i></i></span><span class="name">A連打</span></a>
+          <a href="#y1"><span class="blink c-amber" aria-label="黄1回"><i></i></span><span class="name">卵を受け取る</span></a>
+          <a href="#y2"><span class="blink c-amber" aria-label="黄2回"><i></i><i></i></span><span class="name">卵を孵す</span></a>
+          <a href="#g1"><span class="blink c-green" aria-label="緑1回"><i></i></span><span class="name">ボックスのポケモンを逃がす</span></a>
+          <a href="#b1"><span class="blink c-blue" aria-label="青1回"><i></i></span><span class="name">競り</span></a>
+          <a href="#b2"><span class="blink c-blue" aria-label="青2回"><i></i><i></i></span><span class="name">コレクレーのコイン</span></a>
+          <a href="#b3"><span class="blink c-blue" aria-label="青3回"><i></i><i></i><i></i></span><span class="name">どうぐプリンター 乱数</span></a>
+          <a href="#b4"><span class="blink c-blue" aria-label="青4回"><i></i><i></i><i></i><i></i></span><span class="name">どうぐプリンター 回数指定</span></a>
+          <a href="#r1"><span class="blink c-red" aria-label="赤1回"><i></i></span><span class="name">学校最強大会</span></a>
+          <a href="#r2"><span class="blink c-red" aria-label="赤2回"><i></i><i></i></span><span class="name">テラレイド ホスト（ローカル）</span></a>
+          <a href="#r3"><span class="blink c-red" aria-label="赤3回"><i></i><i></i><i></i></span><span class="name">BP集め（そらとぶタイムアタック）</span></a>
+          <a href="#r4"><span class="blink c-red" aria-label="赤4回"><i></i><i></i><i></i><i></i></span><span class="name">素材集め（その場でレッツゴー）</span></a>
+          <a href="#p1"><span class="blink c-purple" aria-label="紫1回"><i></i></span><span class="name">Switch 1 ／ Switch 2 の切り替え</span></a>
+          <a href="#p2"><span class="blink c-purple" aria-label="紫2回"><i></i><i></i></span><span class="name">日付を1日進めるテスト</span></a>
         </div>
       </div>
     </div>
+    <p class="note">競りとコレクレーのコインは本体の日付を変えながら動きます。どうぐプリンター 乱数は本体の時計を使います。</p>
   </section>
 
   <section aria-labelledby="h-input">
     <h2 id="h-input">回数の入れ方</h2>
-    <p>水色に光っている4秒間に押した回数が数字になる。</p>
-    <div class="window-demo" aria-label="入力の例">
-      <span class="led c-cyan"><i></i></span><span class="slot">1回目 = 10の位</span><span class="arrow">→</span>
-      <span class="led c-cyan"><i></i></span><span class="slot">2回目 = 1の位</span>
-    </div>
+    <p>スタートすると、機能によってはLEDが<b>水色</b>になって数を聞いてきます。</p>
     <ul>
-      <li>12 → 1回目に1回、2回目に2回。ボックス数・回数は何も押さなければ 1。</li>
+      <li>水色のあいだ（4秒）に押した回数が、その数になる。押すたびに白く光る。</li>
+      <li>何も押さなければ <b>0</b>。ただしボックス数や回数は、全部押さなければ <b>1</b> になる。</li>
+      <li>水色が一度消えて、また水色になったら次の質問。</li>
     </ul>
-    <h3>卵のサイクル数</h3>
+    <div class="callout">
+      <b>例：「ボックス数」を 12 にしたいとき</b>（質問が2回くる）<br>
+      1回目の水色 → <b>1回</b>押す（10の位）<br>
+      2回目の水色 → <b>2回</b>押す（1の位）<br>
+      3ボックスなら、1回目は押さずに待って、2回目に3回押す。
+    </div>
+  </section>
+
+  <section aria-labelledby="cycle">
+    <h2 id="cycle">卵のサイクル数</h2>
+    <p>孵すポケモンのサイクル数（攻略サイトの図鑑に載っている）に合わせて押す。</p>
     <div class="table-scroll">
       <table>
         <thead><tr><th>押す回数</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7以上</th></tr></thead>
@@ -281,185 +272,289 @@ footer { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction:
     </div>
   </section>
 
+  <section aria-labelledby="h-settings">
+    <h2 id="h-settings">最初に1回だけやっておくこと</h2>
+    <ul class="check">
+      <li>ゲームのオプション：話のはやさ「はやい」／わざ覚えスキップ「する」／手持ち・ボックス「自動で送る」／ニックネーム登録「しない」</li>
+      <li>マップを開いて右スティックを押し込み、「北が上」に固定する</li>
+      <li>オフラインにしておく（テラレイド ホストのときは除く）</li>
+      <li>青の機能を使うなら：本体の設定で「インターネットで時刻を合わせる」をオフ</li>
+      <li>Switch 1・Lite で使うなら：<a href="#p1">Switch 1 ／ Switch 2 の切り替え</a>で Switch 1 にする（最初は Switch 2）</li>
+    </ul>
+  </section>
+
   <section aria-labelledby="h-modes">
     <h2 id="h-modes">機能ごとの説明</h2>
 
     <article class="mode" id="w1">
-      <div class="mode-head"><span class="led c-white"><i></i><b>1</b></span><h3>A連打</h3></div>
+      <div class="mode-head"><span class="blink c-white" aria-label="白1回"><i></i></span><h3>A連打</h3></div>
+      <p class="what">Aボタンを押し続ける。</p>
       <dl>
-        <dt>動き</dt><dd>Aボタンを押し続ける。</dd>
-        <dt>開始</dt><dd>どこでも</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>どこでも</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
       </dl>
     </article>
 
     <article class="mode" id="y1">
-      <div class="mode-head"><span class="led c-amber"><i></i><b>1</b></span><h3>卵受取</h3></div>
+      <div class="mode-head"><span class="blink c-amber" aria-label="黄1回"><i></i></span><h3>卵を受け取る</h3></div>
+      <p class="what">コサジの小道の灯台へ飛んでピクニック → サンドイッチでタマゴパワー → 30分間、1分ごとにバスケットから卵をもらう → プラトタウンへ戻る、をくり返す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>ピクニックとサンドイッチのチュートリアルを終える</li>
+        <li>「17 スーパーピーナッツバターサンド」のレシピを解放し、材料（バナナスライス・ピーナッツバター・バター・ピック）を回数分買っておく</li>
+        <li>手持ちは親の<b>2匹だけ</b></li>
+        <li>ボックスに十分な空きを作る（1回で50個前後もらう）</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>コサジの小道の灯台へ飛んでピクニック → サンドイッチでタマゴパワー → 30分間、1分ごとにバスケットから卵をもらう → プラトタウンへ戻る、をくり返す。終わったら本体がスリープする。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>ピクニックとサンドイッチのチュートリアルを終える。</li>
-            <li>「17 スーパーピーナッツバターサンド」のレシピを解放し、材料（バナナスライス・ピーナッツバター・バター・ピック）を回数分買っておく。</li>
-            <li>手持ちは親の<strong>2匹だけ</strong>。ボックスに十分な空きを作る（1回で50個前後）。</li>
-          </ul>
+        <dt>スタート位置</dt><dd>プラトタウンに「そらをとぶ」した着地点</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>ピクニックの回数の10の位</li>
+            <li>ピクニックの回数の1の位</li>
+          </ol>
+          <span class="ex">例：3回 → ①押さない ②3回</span>
         </dd>
-        <dt>開始</dt><dd>プラトタウンに「そらをとぶ」した着地点</dd>
-        <dt>入力</dt><dd>水色2回：ピクニックの回数（10の位 → 1の位）</dd>
+        <dt>終わり</dt><dd>本体がスリープする</dd>
       </dl>
     </article>
 
     <article class="mode" id="y2">
-      <div class="mode-head"><span class="led c-amber"><i></i><b>2</b></span><h3>卵孵化</h3></div>
+      <div class="mode-head"><span class="blink c-amber" aria-label="黄2回"><i></i><i></i></span><h3>卵を孵す</h3></div>
+      <p class="what">ボックスの卵を左の列から5個ずつ手持ちに入れ、ライドで走って孵す。孵ったポケモンはボックスに戻す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>手持ちは特性「ほのおのからだ」などのポケモン<b>1匹だけ</b></li>
+        <li>連れ歩きなし、ライドしていない状態にする</li>
+        <li>卵を敷き詰めたボックスを並べ、ボックスを開いたときに<b>最初の卵のボックスが出る</b>ようにしておく</li>
+        <li>卵は同じ歩数のものだけにする</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>ボックスの卵を左の列から5個ずつ手持ちに入れ、ライドで走って孵す。孵ったポケモンはボックスに戻す。終わったら本体がスリープする。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>手持ちは とくせい「ほのおのからだ」などのポケモン<strong>1匹だけ</strong>。連れ歩きなし、ライドしていない状態。</li>
-            <li>卵を敷き詰めたボックスを並べ、ボックスを開いたときに<strong>最初の卵のボックスが出る</strong>ようにしておく。</li>
-            <li>同じ歩数の卵だけにする。</li>
-          </ul>
+        <dt>スタート位置</dt><dd>セルクルタウン西から北にある「オリーブころがし」の柵の中（真ん中あたり。オリーブは端に寄せておくとなお良い）</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>卵のサイクル数（<a href="#cycle">サイクル数の表</a>）</li>
+            <li>ボックス数の10の位</li>
+            <li>ボックス数の1の位</li>
+          </ol>
+          <span class="ex">例：サイクル20の卵を3ボックス → ①4回 ②押さない ③3回</span>
         </dd>
-        <dt>開始</dt><dd>セルクルタウン西から北にある「オリーブころがし」の柵の中（真ん中あたり。オリーブは端に寄せておくとなお良い）</dd>
-        <dt>入力</dt><dd>水色3回：サイクル数 → ボックス数の10の位 → 1の位</dd>
+        <dt>終わり</dt><dd>本体がスリープする</dd>
       </dl>
     </article>
 
     <article class="mode" id="g1">
-      <div class="mode-head"><span class="led c-green"><i></i><b>1</b></span><h3>ボックス逃がし</h3></div>
+      <div class="mode-head"><span class="blink c-green" aria-label="緑1回"><i></i></span><h3>ボックスのポケモンを逃がす</h3></div>
+      <p class="what">ボックスのポケモンを左上から順に逃がす。決めたボックス数を逃がしたら止まる。<b>逃がしたポケモンは戻らない。</b></p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>逃がすボックスは30匹すべて埋めて並べる（空きやタマゴがあるとずれる）</li>
+        <li>ボックスを開いたときに、最初に逃がすボックスが出るようにしておく</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>ボックスのポケモンを左上から順に逃がす。指定したボックス数を逃がしたら本体がスリープする。</dd>
-        <dt>準備</dt><dd>逃がすボックスは30匹すべて埋めて並べる（空きやタマゴがあるとずれる）。ボックスを開いたときに最初のボックスが出るようにしておく。</dd>
-        <dt>開始</dt><dd>フィールドでメニューを閉じた状態</dd>
-        <dt>入力</dt><dd>水色2回：ボックス数（10の位 → 1の位）</dd>
+        <dt>スタート位置</dt><dd>フィールドで、メニューを閉じた状態</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>ボックス数の10の位</li>
+            <li>ボックス数の1の位</li>
+          </ol>
+          <span class="ex">例：2ボックス → ①押さない ②2回</span>
+        </dd>
+        <dt>終わり</dt><dd>本体がスリープする</dd>
       </dl>
     </article>
 
     <article class="mode" id="b1">
-      <div class="mode-head"><span class="led c-blue"><i></i><b>1</b></span><h3>競り</h3></div>
+      <div class="mode-head"><span class="blink c-blue" aria-label="青1回"><i></i></span><h3>競り</h3></div>
+      <p class="what">競りでA連打して買う → セーブ → 日付を1日進める → ゲームを再起動、をくり返す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>お金をたくさん持っておく</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>競りでA連打して買う → セーブ → 日付を1日進める → ゲームを再起動、をくり返す。</dd>
-        <dt>準備</dt><dd>お金をたくさん持っておく。</dd>
-        <dt>開始</dt><dd>マリナードタウンの競り会場の受付の前</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>マリナードタウンの競り会場の受付の前</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+        <dt>止め方</dt><dd>1秒長押し</dd>
       </dl>
     </article>
 
     <article class="mode" id="b2">
-      <div class="mode-head"><span class="led c-blue"><i></i><b>2</b></span><h3>コレクレーのコイン</h3></div>
+      <div class="mode-head"><span class="blink c-blue" aria-label="青2回"><i></i><i></i></span><h3>コレクレーのコイン</h3></div>
+      <p class="what">パルデア十景を「そらをとぶ」で回り、看板のそばのコレクレーからコインを拾う → セーブ → 日付を1日進めて再起動、をくり返す（1周6分くらい）。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>パルデア十景にすべて行っておく</li>
+        <li>ライドから降りておく</li>
+        <li>ひそやかビーチに「そらをとぶ」して、正面に看板が見える状態（カメラ・主人公とも東向き）でセーブする</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>パルデア十景を「そらをとぶ」で回って、看板のそばのコレクレーからコインを拾う → セーブ → 日付を1日進めて再起動、をくり返す（1周6分くらい）。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>パルデア十景にすべて行っておく。</li>
-            <li>ライドから降りておく。</li>
-            <li>ひそやかビーチに「そらをとぶ」して、正面に看板が見える状態（カメラ・主人公とも東向き）でセーブ。</li>
-          </ul>
-        </dd>
-        <dt>開始</dt><dd>上のセーブをした場所</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>上のセーブをした場所</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+        <dt>止め方</dt><dd>1秒長押し。野生のポケモンと戦闘になったときも長押しで止める</dd>
       </dl>
-      <p class="note">飛び先の近くにテラレイドがあるとカーソルが吸われることがある。野生のポケモンと戦闘になったときも、長押しで止める。</p>
+      <p class="note">飛び先の近くにテラレイドがあると、カーソルが吸われることがある。</p>
     </article>
 
     <article class="mode" id="b3">
-      <div class="mode-head"><span class="led c-blue"><i></i><b>3</b></span><h3>どうぐプリンター 乱数</h3></div>
+      <div class="mode-head"><span class="blink c-blue" aria-label="青3回"><i></i><i></i><i></i></span><h3>どうぐプリンター 乱数</h3></div>
+      <p class="what">決まった日時に合わせてプリンターを回し、チャンスタイム → ねらったアイテムの10連、をくり返す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>プリンターの改良を最後まで終え、素材とBPをためておく</li>
+        <li>研究員に話しかけ、プリント回数を<b>10連</b>にしておく</li>
+        <li>本体の時計を<b>2050年1月1日 0時0分</b>にする</li>
+      </ul>
+      <div class="callout">時計を合わせたら、<b>40秒以内</b>にスタートする。</div>
       <dl>
-        <dt>動き</dt><dd>決まった日時に合わせてプリンターを回し、チャンスタイム → ねらったアイテムの10連、をくり返す。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>プリンターの改良を最後まで終え、素材とBPをためておく。</li>
-            <li>研究員に話しかけ、プリント回数を<strong>10連</strong>にしておく。</li>
-          </ul>
-        </dd>
-        <dt>開始</dt><dd>研究員に話しかけられる位置。本体の時計を<strong>2050年1月1日 0時0分</strong>にして、<strong>40秒以内</strong>にスタートする</dd>
-        <dt>入力</dt><dd>水色1回：ねらうアイテム（0回なら2）
-          <ul>
-            <li>1回：マスターボール5・ヘビーボール1</li>
-            <li>2回：いろんなボール10個</li>
-            <li>3回：コンペボール5（5連）</li>
-            <li>4回：特性パッチ9</li>
-            <li>5回：虹のテラピース57</li>
-          </ul>
+        <dt>スタート位置</dt><dd>研究員に話しかけられる位置</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>ねらうアイテム（押す回数で選ぶ）
+              <ul>
+                <li>1回：マスターボール5・ヘビーボール1</li>
+                <li>2回：いろんなボール10個（押さないときもこれ）</li>
+                <li>3回：コンペボール5（5連）</li>
+                <li>4回：特性パッチ9</li>
+                <li>5回：虹のテラピース57</li>
+              </ul>
+            </li>
+          </ol>
+          <span class="ex">例：特性パッチをねらう → ①4回</span>
         </dd>
       </dl>
     </article>
 
     <article class="mode" id="b4">
-      <div class="mode-head"><span class="led c-blue"><i></i><b>4</b></span><h3>どうぐプリンター 回数指定</h3></div>
+      <div class="mode-head"><span class="blink c-blue" aria-label="青4回"><i></i><i></i><i></i><i></i></span><h3>どうぐプリンター 回数指定</h3></div>
+      <p class="what">おまかせでプリンターを回す、を決めた回数くり返す。日付は変えない。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>プリント回数（1・5・10連）を先に合わせておく</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>おまかせでプリンターを回す、を指定した回数くり返す。日付は変えない。</dd>
-        <dt>準備</dt><dd>プリント回数（1・5・10連）を先に合わせておく。</dd>
-        <dt>開始</dt><dd>研究員に話しかけられる位置</dd>
-        <dt>入力</dt><dd>水色3回：回数の百の位 → 十の位 → 一の位（53回なら 0・5・3）</dd>
+        <dt>スタート位置</dt><dd>研究員に話しかけられる位置</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>回す回数の100の位</li>
+            <li>回す回数の10の位</li>
+            <li>回す回数の1の位</li>
+          </ol>
+          <span class="ex">例：53回 → ①押さない ②5回 ③3回</span>
+        </dd>
+        <dt>終わり</dt><dd>決めた回数を回したら止まる</dd>
       </dl>
     </article>
 
     <article class="mode" id="r1">
-      <div class="mode-head"><span class="led c-red"><i></i><b>1</b></span><h3>学校最強大会</h3></div>
+      <div class="mode-head"><span class="blink c-red" aria-label="赤1回"><i></i></span><h3>学校最強大会</h3></div>
+      <p class="what">A連打で学校最強大会をくり返す。お金稼ぎやレベル上げに。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>手持ちの先頭にLv100の強いポケモン（ハバタクカミなど）</li>
+        <li>技のいちばん上を強い技にする</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>A連打で学校最強大会をくり返す（金策・レベル上げ）。</dd>
-        <dt>準備</dt><dd>先頭にLv100の強いポケモン（ハバタクカミなど）。技の一番上を強い技にする。</dd>
-        <dt>開始</dt><dd>学校最強大会の受付の前</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>学校最強大会の受付の前</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+        <dt>止め方</dt><dd>1秒長押し</dd>
       </dl>
       <p class="note">先頭が倒れると止まる。</p>
     </article>
 
     <article class="mode" id="r2">
-      <div class="mode-head"><span class="led c-red"><i></i><b>2</b></span><h3>テラレイド ホスト（ローカル）</h3></div>
+      <div class="mode-head"><span class="blink c-red" aria-label="赤2回"><i></i><i></i></span><h3>テラレイド ホスト（ローカル）</h3></div>
+      <div class="callout"><b>参加するもう1台のSwitch（ゲスト）が必要。</b>ゲストは画面のあいことばを入れて参加する。</div>
+      <p class="what">同じテラレイドをローカル通信で募集 → 戦闘 → ゲームを再起動、をくり返す。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>報酬の良いテラレイドを見つけ、Aで始められる位置でセーブしてソフトを終了する</li>
+        <li>本体の時計を、同じ日付のうちで巻き戻しておく（日付が変わるとレイドが変わる）</li>
+        <li>手持ちの先頭にレイド用のポケモン。使う技をいちばん上にする</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>同じテラレイドをローカル通信で募集 → 戦闘 → ゲームを再起動、をくり返す。<strong>参加するもう1台のSwitch（ゲスト）が必要</strong>。ゲストは画面のあいことばを入れて参加する。</dd>
-        <dt>準備</dt><dd>
-          <ul>
-            <li>報酬の良いテラレイドを見つけ、Aで始められる位置でセーブしてソフトを終了。</li>
-            <li>本体の時計を、同じ日付のうちで巻き戻しておく（日付が変わるとレイドが変わる）。</li>
-            <li>手持ちの先頭にレイド用のポケモン。使う技を一番上に。</li>
-          </ul>
+        <dt>スタート位置</dt><dd>レイドの結晶に話しかけられる位置</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>レイドの種類
+              <ul>
+                <li>押さない：一撃で倒せないレイド（★6など）。ホストも攻撃する</li>
+                <li>1回以上：一撃で倒せるレイド（メタモン、★3・4など）。ホストは攻撃しない</li>
+              </ul>
+            </li>
+          </ol>
+          <span class="ex">例：★6 のレイド → ①押さない</span>
         </dd>
-        <dt>開始</dt><dd>レイドの結晶に話しかけられる位置</dd>
-        <dt>入力</dt><dd>水色1回：0回＝一撃で倒せないレイド用（★6など。ホストも攻撃する）／1回以上＝一撃で倒せるレイド用（メタモン、★3・4など。ホストは攻撃しない）</dd>
+        <dt>止め方</dt><dd>1秒長押し</dd>
       </dl>
     </article>
 
     <article class="mode" id="r3">
-      <div class="mode-head"><span class="led c-red"><i></i><b>3</b></span><h3>BP集め（そらとぶタイムアタック）</h3></div>
+      <div class="mode-head"><span class="blink c-red" aria-label="赤3回"><i></i><i></i><i></i></span><h3>BP集め（そらとぶタイムアタック）</h3></div>
+      <p class="what">藍の円盤の「そらとぶタイムアタック」初級をくり返してBPを集める（1周約90秒で10BP）。</p>
       <dl>
-        <dt>動き</dt><dd>藍の円盤のそらとぶタイムアタック初級をくり返してBPを集める（1周約90秒・10BP）。</dd>
-        <dt>開始</dt><dd>そらとぶタイムアタックの受付の前</dd>
-        <dt>入力</dt><dd>なし</dd>
+        <dt>スタート位置</dt><dd>そらとぶタイムアタックの受付の前</dd>
+        <dt>聞かれる数</dt><dd>なし</dd>
+        <dt>止め方</dt><dd>1秒長押し</dd>
       </dl>
       <p class="note">雨の日は処理落ちでずれやすい。</p>
     </article>
 
     <article class="mode" id="r4">
-      <div class="mode-head"><span class="led c-red"><i></i><b>4</b></span><h3>素材集め（その場でレッツゴー）</h3></div>
+      <div class="mode-head"><span class="blink c-red" aria-label="赤4回"><i></i><i></i><i></i><i></i></span><h3>素材集め（その場でレッツゴー）</h3></div>
+      <p class="what">Rでレッツゴー → 決めた秒数待つ → Rで戻す、をくり返す。戦闘になったり色違いが出たりすると止まる。</p>
+      <h4>スタート前にやること</h4>
+      <ul class="check">
+        <li>手持ちの先頭にレッツゴー用の高レベルのポケモン</li>
+        <li>ポケモンが湧き続ける場所へ行く（どこでもいい。おすすめはキタカミの地獄谷近くの洞窟の、左の岩場で南の窪みを向く場所）</li>
+        <li>Lでカメラを向けたい方に合わせる</li>
+      </ul>
       <dl>
-        <dt>動き</dt><dd>Rでレッツゴー → 指定した秒数待つ → Rで戻す、をくり返す。戦闘になったり色違いが出たりすると止まる。</dd>
-        <dt>準備</dt><dd>先頭にレッツゴー用の高レベルのポケモン。ポケモンが湧き続ける場所ならどこでもいい（キタカミの地獄谷近くの洞窟の、左の岩場で南の窪みを向くのがおすすめ）。</dd>
-        <dt>開始</dt><dd>上の場所で、Lでカメラを向けたい方に合わせた状態</dd>
-        <dt>入力</dt><dd>水色2回：待つ秒数の10の位 → 1の位（どちらも0回なら15秒）</dd>
+        <dt>スタート位置</dt><dd>上の場所</dd>
+        <dt>聞かれる数</dt><dd>
+          <ol class="q">
+            <li>待つ秒数の10の位</li>
+            <li>待つ秒数の1の位</li>
+          </ol>
+          <span class="ex">例：20秒 → ①2回 ②押さない。どちらも押さなければ15秒</span>
+        </dd>
+        <dt>止め方</dt><dd>1秒長押し</dd>
       </dl>
     </article>
 
     <article class="mode" id="p1">
-      <div class="mode-head"><span class="led c-purple"><i></i><b>1</b></span><h3>本体切替</h3></div>
+      <div class="mode-head"><span class="blink c-purple" aria-label="紫1回"><i></i></span><h3>Switch 1 ／ Switch 2 の切り替え</h3></div>
+      <p class="what">1秒長押しするたびに Switch 2 ⇔ Switch 1 が切り替わる。設定は保存される。</p>
       <dl>
-        <dt>動き</dt><dd>1秒長押しするたびに Switch 2 ⇔ Switch 1 が切り替わり、白の点滅で知らせる（1回＝Switch 1、2回＝Switch 2）。設定は保存される。</dd>
-        <dt>違い</dt><dd>青の機能の日付変更の手順と、コレクレーのコインの「そらをとぶ」のカーソル移動時間が変わる。</dd>
+        <dt>今の設定</dt><dd>白の点滅で分かる（1回＝Switch 1、2回＝Switch 2）。挿した直後にも出る</dd>
+        <dt>変わること</dt><dd>青の機能の日付の変え方と、コレクレーのコインの「そらをとぶ」のカーソル移動時間</dd>
       </dl>
-      <p class="note">Switch 1 の日付変更は、ホームにソフトが4本以上並んでいる前提。</p>
+      <p class="note">Switch 1 で日付を変えるときは、ホームにソフトが4本以上並んでいる必要がある。</p>
     </article>
 
     <article class="mode" id="p2">
-      <div class="mode-head"><span class="led c-purple"><i></i><b>2</b></span><h3>日付+1 テスト</h3></div>
+      <div class="mode-head"><span class="blink c-purple" aria-label="紫2回"><i></i><i></i></span><h3>日付を1日進めるテスト</h3></div>
+      <p class="what">ホームの設定で日付を1日進めて、ゲームに戻って止まる。日付の変え方がずれていないか確かめる用。</p>
       <dl>
-        <dt>動き</dt><dd>ゲーム中からホームの設定で日付を1日進め、ゲームに戻って止まる。日付変更の手順がずれていないかの確認用。</dd>
-        <dt>開始</dt><dd>ゲーム画面</dd>
+        <dt>スタート位置</dt><dd>ゲーム画面</dd>
       </dl>
     </article>
+  </section>
 
-    <a class="top-link" href="#top">早見表に戻る</a>
+  <section aria-labelledby="h-led">
+    <h2 id="h-led">LEDの光り方</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>光り方</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>すみれ色で光りっぱなし</td><td>挿した直後。登録中</td></tr>
+          <tr><td>白で1回か2回点滅</td><td>登録の直後。本体の設定（1回＝Switch 1、2回＝Switch 2）</td></tr>
+          <tr><td>機能の色で点滅をくり返す</td><td>止まっている。点滅の回数と色で今の機能が分かる</td></tr>
+          <tr><td>機能の色で光りっぱなし</td><td>動いている</td></tr>
+          <tr><td>水色</td><td>数を聞いている（4秒間）</td></tr>
+          <tr><td>白く一瞬光る</td><td>押した1回を数えた</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <a class="top-link" href="#top">上に戻る</a>
   </section>
 </div>
 </body>
