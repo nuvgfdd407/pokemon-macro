@@ -188,6 +188,12 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
 .ex { display: block; margin-top: 6px; font-size: 0.88rem; color: var(--muted); background: var(--code-bg); border-radius: 6px; padding: 6px 10px; }
 .callout { line-height: 1.9; }
 @media (max-width: 420px) { .rows a { grid-template-columns: 70px 1fr; } }
+
+/* 元記事の画像（作者の許可済み） */
+.shot { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.shot img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+.shot figcaption { font-size: 0.85rem; color: var(--muted); }
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 </style>
 </head>
 <body>
@@ -397,6 +403,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         </dd>
         <dt>止め方</dt><dd>1秒長押し</dd>
       </dl>
+      <div class="shots"><figure class="shot"><img src="img/koke/bdsp-b1-1.png" alt="地下大洞窟のマップ。赤丸が回復してくれる山男の場所" loading="lazy"><figcaption>地下大洞窟のマップ。赤丸が回復してくれる山男の場所（画像：<a href="https://kokenikki.blogspot.com/2021/12/bdsp02.html">苔むした日記帳</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="b2">
@@ -428,6 +435,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         </table>
       </div>
       <p class="note">日付が変わると交換リストが変わるので、日をまたぐ前に止める。</p>
+      <div class="shots"><figure class="shot"><img src="img/koke/bdsp-b2-1.png" alt="山男の「グッズをもらう」で出る交換リスト。わざマシンのタマの個数を確認する" loading="lazy"><figcaption>山男の「グッズをもらう」で出る交換リスト。わざマシンのタマの個数を確認する（画像：<a href="https://kokenikki.blogspot.com/2021/12/bdsp03.html">苔むした日記帳</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="b3">
@@ -493,6 +501,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         </dd>
         <dt>止め方</dt><dd>1秒長押し</dd>
       </dl>
+      <div class="shots"><figure class="shot"><img src="img/koke/bdsp-r1-1.png" alt="ボールカプセルの並べ方（1段目：かっこよさ・うつくしさ・かわいさ・かしこさ、2段目：たくましさ・ブリリアントシャイニング）" loading="lazy"><figcaption>ボールカプセルの並べ方（1段目：かっこよさ・うつくしさ・かわいさ・かしこさ、2段目：たくましさ・ブリリアントシャイニング）（画像：<a href="https://kokenikki.blogspot.com/2022/06/bdsp07.html">苔むした日記帳</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="r2">

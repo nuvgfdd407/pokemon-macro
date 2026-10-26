@@ -188,6 +188,12 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
 .ex { display: block; margin-top: 6px; font-size: 0.88rem; color: var(--muted); background: var(--code-bg); border-radius: 6px; padding: 6px 10px; }
 .callout { line-height: 1.9; }
 @media (max-width: 420px) { .rows a { grid-template-columns: 70px 1fr; } }
+
+/* 元記事の画像（作者の許可済み） */
+.shot { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.shot img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+.shot figcaption { font-size: 0.85rem; color: var(--muted); }
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 </style>
 </head>
 <body>
@@ -366,6 +372,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         <dt>終わり</dt><dd>殿堂入りまで進めて、本体がスリープする</dd>
       </dl>
       <p class="callout">戦闘で技を選ばずに進むので、準備がずれていると止まる。8番道路やウールーを誘導する場面で止まることがある。今は途中から再開できないので、止まったら、どの場面で止まったかメモしておく（直すときに使う）。</p>
+      <div class="shots"><figure class="shot"><img src="img/koke/story-b-1.png" alt="中盤以降を始める前の手持ちとボックス1の状態" loading="lazy"><figcaption>中盤以降を始める前の手持ちとボックス1の状態（画像：<a href="https://kokenikki.blogspot.com/2021/11/poke13.html">苔むした日記帳</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="zs">

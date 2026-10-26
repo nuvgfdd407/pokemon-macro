@@ -187,6 +187,12 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
 .ex { display: block; margin-top: 6px; font-size: 0.88rem; color: var(--muted); background: var(--code-bg); border-radius: 6px; padding: 6px 10px; }
 .callout { line-height: 1.9; }
 @media (max-width: 420px) { .rows a { grid-template-columns: 70px 1fr; } }
+
+/* 元記事の画像（作者の許可済み） */
+.shot { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.shot img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+.shot figcaption { font-size: 0.85rem; color: var(--muted); }
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 </style>
 </head>
 <body>
@@ -401,6 +407,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         <dt>スタート位置</dt><dd>「花の楽園」で、シェイミの前に立ってレポートを書いた状態</dd>
         <dt>聞かれる数</dt><dd>なし</dd>
       </dl>
+      <div class="shots"><figure class="shot"><img src="img/koke/shiny-t1-1.png" alt="手持ちの先頭の例：1番上の技を自分が倒れる技（いやしのねがい）にしておく" loading="lazy"><figcaption>手持ちの先頭の例：1番上の技を自分が倒れる技（いやしのねがい）にしておく（画像：<a href="https://kokenikki.blogspot.com/2022/03/bdsp03.html">苔むした日記帳</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="t2">
@@ -415,6 +422,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         <dt>スタート位置</dt><dd>ミオシティのポケモンセンターの後ろにある「波止場の宿」の前に立って、レポートを書いた状態</dd>
         <dt>聞かれる数</dt><dd>なし</dd>
       </dl>
+      <div class="shots"><figure class="shot"><img src="img/koke/shiny-t2-1.png" alt="ミオシティのポケモンセンター裏にある波止場の宿" loading="lazy"><figcaption>ミオシティのポケモンセンター裏にある波止場の宿（画像：<a href="https://kokenikki.blogspot.com/2022/04/bdsp05.html">苔むした日記帳</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="t3">
@@ -430,6 +438,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         <dt>スタート位置</dt><dd>テンガン山の頂上、槍の柱に入るところ（洞窟の出口）に立って、レポートを書いた状態</dd>
         <dt>聞かれる数</dt><dd>なし</dd>
       </dl>
+      <div class="shots"><figure class="shot"><img src="img/koke/shiny-t3-1.png" alt="テンガン山頂上の槍の柱。ここでてんかいのふえを吹く" loading="lazy"><figcaption>テンガン山頂上の槍の柱。ここでてんかいのふえを吹く（画像：<a href="https://kokenikki.blogspot.com/2022/04/bdsp05.html">苔むした日記帳</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="t4">
@@ -489,6 +498,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
           <span class="ex">例：手持ち6匹の3匹目が使う → ①3回 ②押さない</span>
         </dd>
       </dl>
+      <div class="shots"><figure class="shot"><img src="img/master/shiny-f1-1.png" alt="メニューの「ポケモン」にカーソルを合わせて閉じる" loading="lazy"><figcaption>メニューの「ポケモン」にカーソルを合わせて閉じる（画像：<a href="https://tangential-star.hatenablog.jp/entry/Arduino_pokemon_FRLG02_shinyhunt_using_SweetScent">ますたーの忘備録</a>）</figcaption></figure><figure class="shot"><img src="img/master/shiny-f1-2.png" alt="設定：ボタンモードLR、はなしのはやさ はやい" loading="lazy"><figcaption>設定：ボタンモードLR、はなしのはやさ はやい（画像：<a href="https://tangential-star.hatenablog.jp/entry/Arduino_pokemon_FRLG02_shinyhunt_using_SweetScent">ますたーの忘備録</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="f2">
@@ -514,6 +524,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         </dd>
         <dt>終わり</dt><dd>スプレーを使い切ると止まる</dd>
       </dl>
+      <div class="shots"><figure class="shot"><img src="img/master/shiny-f2-1.png" alt="むじんはつでんしょの場所（イワヤマトンネルのポケモンセンターから南へなみのり）" loading="lazy"><figcaption>むじんはつでんしょの場所（イワヤマトンネルのポケモンセンターから南へなみのり）（画像：<a href="https://tangential-star.hatenablog.jp/entry/Arduino_pokemon_FRLG04_auto_hunt_Shiny_Zapdos">ますたーの忘備録</a>）</figcaption></figure><figure class="shot"><img src="img/master/shiny-f2-2.png" alt="メニューのカーソル位置を合わせてから閉じる" loading="lazy"><figcaption>メニューのカーソル位置を合わせてから閉じる（画像：<a href="https://tangential-star.hatenablog.jp/entry/Arduino_pokemon_FRLG04_auto_hunt_Shiny_Zapdos">ますたーの忘備録</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="f3">
@@ -537,6 +548,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         </dd>
       </dl>
       <p class="note">ふたごじまの中は処理が重く、まれに動きがずれる。長い時間放っておくときは、ときどき様子を見る。</p>
+      <div class="shots"><figure class="shot"><img src="img/master/shiny-f3-1.png" alt="バッグの一番上にゴールドスプレー" loading="lazy"><figcaption>バッグの一番上にゴールドスプレー（画像：<a href="https://tangential-star.hatenablog.jp/entry/Arduino_pokemon_FRLG06_auto_hunt_Shiny_Articuno">ますたーの忘備録</a>）</figcaption></figure><figure class="shot"><img src="img/master/shiny-f3-2.png" alt="設定：ボタンモードLR、はなしのはやさ はやい" loading="lazy"><figcaption>設定：ボタンモードLR、はなしのはやさ はやい（画像：<a href="https://tangential-star.hatenablog.jp/entry/Arduino_pokemon_FRLG06_auto_hunt_Shiny_Articuno">ますたーの忘備録</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="f4">
@@ -553,6 +565,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         <dt>スタート位置</dt><dd>ともしびやまの山頂、ファイヤーのすぐ下のマスで、上を向いて立つ</dd>
         <dt>聞かれる数</dt><dd>なし</dd>
       </dl>
+      <div class="shots"><figure class="shot"><img src="img/master/shiny-f4-1.png" alt="バッグの一番上に戦闘中に使えないどうぐを置きカーソルを合わせる" loading="lazy"><figcaption>バッグの一番上に戦闘中に使えないどうぐを置きカーソルを合わせる（画像：<a href="https://tangential-star.hatenablog.jp/entry/Arduino_pokemon_FRLG07_auto_hunt_Shiny_Moltres">ますたーの忘備録</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="f5">
@@ -568,6 +581,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         <dt>聞かれる数</dt><dd>なし</dd>
       </dl>
       <p class="note">まれに追いかけっこでデオキシスを通り抜けて、戦闘にならない回がある。次の回で元に戻る。</p>
+      <div class="shots"><figure class="shot"><img src="img/master/shiny-f5-1.png" alt="たんじょうのしま：三角形のすぐ下のマスに上向きで立つ" loading="lazy"><figcaption>たんじょうのしま：三角形のすぐ下のマスに上向きで立つ（画像：<a href="https://tangential-star.hatenablog.jp/entry/Arduino_pokemon_FRLG08_auto_hunt_Shiny_Deoxys">ますたーの忘備録</a>）</figcaption></figure></div>
     </article>
 
     <a class="top-link" href="#top">上に戻る</a>

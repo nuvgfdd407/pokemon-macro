@@ -189,6 +189,12 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
 .ex { display: block; margin-top: 6px; font-size: 0.88rem; color: var(--muted); background: var(--code-bg); border-radius: 6px; padding: 6px 10px; }
 .callout { line-height: 1.9; }
 @media (max-width: 420px) { .rows a { grid-template-columns: 70px 1fr; } }
+
+/* 元記事の画像（作者の許可済み） */
+.shot { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.shot img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+.shot figcaption { font-size: 0.85rem; color: var(--muted); }
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 </style>
 </head>
 <body>
@@ -316,6 +322,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         </dd>
         <dt>終わり</dt><dd>本体がスリープする</dd>
       </dl>
+      <div class="shots"><figure class="shot"><img src="img/pokemonit/y1-1.jpeg" alt="スタート位置：プラトタウンの着地点（ポケセンのそば）" loading="lazy"><figcaption>スタート位置：プラトタウンの着地点（ポケセンのそば）（画像：<a href="https://pokemonit.com/sv-auto-receive-eggs/">ポケモニット</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="y2">
@@ -340,6 +347,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         </dd>
         <dt>終わり</dt><dd>本体がスリープする</dd>
       </dl>
+      <div class="shots"><figure class="shot"><img src="img/pokemonit/y2-1.jpeg" alt="スタート位置：オリーブころがし場の柵の中（まん中あたり）" loading="lazy"><figcaption>スタート位置：オリーブころがし場の柵の中（まん中あたり）（画像：<a href="https://pokemonit.com/auto-hatch-eggs-in-the-box-on-olive/">ポケモニット</a>）</figcaption></figure><figure class="shot"><img src="img/pokemonit/y2-2.jpeg" alt="ボックス：タマゴをすき間なく入れておく" loading="lazy"><figcaption>ボックス：タマゴをすき間なく入れておく（画像：<a href="https://pokemonit.com/auto-hatch-eggs-in-the-box-on-olive/">ポケモニット</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="g1">
@@ -361,6 +369,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         </dd>
         <dt>終わり</dt><dd>本体がスリープする</dd>
       </dl>
+      <div class="shots"><figure class="shot"><img src="img/pokemonit/g1-1.jpeg" alt="ボックス：30匹ぜんぶ埋める（空きやタマゴはダメ）" loading="lazy"><figcaption>ボックス：30匹ぜんぶ埋める（空きやタマゴはダメ）（画像：<a href="https://pokemonit.com/sv-auto-release-pokemons/">ポケモニット</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="b1">
@@ -375,6 +384,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         <dt>聞かれる数</dt><dd>なし</dd>
         <dt>止め方</dt><dd>1秒長押し</dd>
       </dl>
+      <div class="shots"><figure class="shot"><img src="img/master/sv-b1-1.png" alt="マリナードタウンの競り会場" loading="lazy"><figcaption>マリナードタウンの競り会場（画像：<a href="https://tangential-star.hatenablog.jp/entry/Arduino_pokemon_SV02_Auctions_in_PortoMarinada">ますたーの忘備録</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="b2">
@@ -392,6 +402,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         <dt>止め方</dt><dd>1秒長押し。野生のポケモンと戦闘になったときも長押しで止める</dd>
       </dl>
       <p class="note">飛び先の近くにテラレイドがあると、カーソルが吸われることがある。</p>
+      <div class="shots"><figure class="shot"><img src="img/master/sv-b2-1.png" alt="本体設定：「インターネットで時間をあわせる」をOFF" loading="lazy"><figcaption>本体設定：「インターネットで時間をあわせる」をOFF（画像：<a href="https://tangential-star.hatenablog.jp/entry/Arduino_pokemon_SV03_Ten_sights_of_Paldea_for_Gimmighoul_Coin">ますたーの忘備録</a>）</figcaption></figure><figure class="shot"><img src="img/master/sv-b2-2.png" alt="パルデア十景の看板をめぐるルート地図" loading="lazy"><figcaption>パルデア十景の看板をめぐるルート地図（画像：<a href="https://tangential-star.hatenablog.jp/entry/Arduino_pokemon_SV03_Ten_sights_of_Paldea_for_Gimmighoul_Coin">ますたーの忘備録</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="b3">
@@ -458,6 +469,7 @@ ol.q li::marker { color: var(--accent); font-weight: 700; }
         <dt>止め方</dt><dd>1秒長押し</dd>
       </dl>
       <p class="note">先頭が倒れると止まる。</p>
+      <div class="shots"><figure class="shot"><img src="img/master/sv-r1-1.png" alt="設定の「わざ覚えスキップ」を「する」に" loading="lazy"><figcaption>設定の「わざ覚えスキップ」を「する」に（画像：<a href="https://tangential-star.hatenablog.jp/entry/Arduino_pokemon_SV01_AcademyAceTournament_automation">ますたーの忘備録</a>）</figcaption></figure></div>
     </article>
 
     <article class="mode" id="r2">
